@@ -1,0 +1,43 @@
+﻿@startuml
+!theme reddress-lightblue
+left to right direction
+"Вопросник" as Questioner
+"Ответчик" as Answerer
+"Администратор" as Admin
+
+usecase (Задать вопрос) as UC1
+usecase (Поиск вопросов / ответов) as UC2
+usecase (Оценить ответ) as UC3
+usecase (Отметить решение) as UC4
+usecase (Редактировать вопрос) as UC5
+usecase (Удалить вопрос) as UC6
+usecase (Комментировать ответ) as UC7
+usecase (Пожаловаться на ответ) as UC8
+
+usecase (Ответить на вопрос) as UC9
+usecase (Пожаловаться на вопрос) as UC10
+
+usecase (Управление пользователями) as UC11
+usecase (Модерация контента) as UC12
+usecase (Рассмотрение жалоб) as UC13
+
+Questioner --> UC1
+Questioner --> UC2
+Questioner --> UC3
+Questioner --> UC4
+Questioner --> UC5
+Questioner --> UC6
+Questioner --> UC7
+Questioner --> UC8
+
+Answerer -up-> UC2
+Answerer -up-> UC3
+Answerer -up-> UC7
+Answerer --> UC9
+Answerer --> UC10
+
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+
+@enduml

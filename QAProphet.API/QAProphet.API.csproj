@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\Documents\Diagrams\UseCase.puml">
+        <Link>Documents\Diagrams\UseCase.puml</Link>
+      </Content>
+      <Content Include="..\Documents\Goals.MD">
+        <Link>Documents\Goals.MD</Link>
+      </Content>
+      <Content Include="..\Documents\README.md">
+        <Link>Documents\README.md</Link>
+      </Content>
+      <Content Include="..\Documents\GeneralInformation.md">
+        <Link>Documents\GeneralInformation.md</Link>
+      </Content>
+      <Content Include="..\Documents\UserStory.md">
+        <Link>Documents\UserStory.md</Link>
+      </Content>
+    </ItemGroup>
+    
+    
+
+</Project>
