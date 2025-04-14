@@ -1,3 +1,5 @@
 - [Общие сведения](./GeneralInformation.md)
 - [Цели и назначения АС](./Goals.MD)
 - [Use Cases](./Diagrams/UseCase.png)
+- [User Stories](./UserStory.md)
+- [Схема БД](./Diagrams/Db.png)

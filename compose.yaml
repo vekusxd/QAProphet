@@ -1,0 +1,28 @@
+﻿services:
+  qaprophet_api:
+    image: qaprophet_api
+    container_name: qaprophet_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: QAProphet.API/Dockerfile
+  
+  db:
+    container_name: qaprophet_db
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: qaDb
+
+
+volumes:
+  db_data:
+  elasticsearch_data:

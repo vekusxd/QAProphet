@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.1.6" use-changelog="false" max-obj-count="7"
+	 last-position="0,0" last-zoom="1" scene-rect="0,0,1586.02,1076.8"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<database name="new_database" is-template="false" allow-conns="true">
+</database>
+
+<schema name="public" layers="0" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
+</schema>
+
+<table name="Question" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="140" y="40"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Title" not-null="true">
+		<type name="varchar" length="96"/>
+	</column>
+	<column name="Content" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="CreatedAt" not-null="true">
+		<type name="date" length="0"/>
+	</column>
+	<column name="Questioner_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<constraint name="Question_pk" type="pk-constr" table="public.&quot;Question&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="Answer" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="760" y="20"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Content" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="Answerer_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Question_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="CreatedAt" not-null="true">
+		<type name="date" length="0"/>
+	</column>
+	<column name="Likes" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Dislikes" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="IsBest" not-null="true" default-value="false">
+		<type name="boolean" length="0"/>
+	</column>
+	<constraint name="Answer_pk" type="pk-constr" table="public.&quot;Answer&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="QuestionComment" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="80" y="540"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Question_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Content" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="Likes" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Dislikes" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Author_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="CreatedAt" not-null="true">
+		<type name="date" length="0"/>
+	</column>
+	<constraint name="QuestionComment_pk" type="pk-constr" table="public.&quot;QuestionComment&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="AnswerComment" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1160" y="380"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Answer_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Content" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="Likes" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Dislikes" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Author_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="CreatedAt">
+		<type name="date" length="0"/>
+	</column>
+	<constraint name="AnswerComment_pk" type="pk-constr" table="public.&quot;AnswerComment&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="Tag" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="860" y="720"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Title" not-null="true">
+		<type name="varchar" length="96"/>
+	</column>
+	<column name="QuestionCount" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="Tag_pk" type="pk-constr" table="public.&quot;Tag&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="QuestionTags" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="600" y="420"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Question_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Tag_Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<constraint name="QuestionTags_pk" type="pk-constr" table="public.&quot;QuestionTags&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="Quesiton_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.&quot;Question&quot;" table="public.&quot;Answer&quot;">
+	<columns names="Question_Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Question_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Question&quot;" table="public.&quot;QuestionComment&quot;">
+	<columns names="Question_Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Answer_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Answer&quot;" table="public.&quot;AnswerComment&quot;">
+	<columns names="Answer_Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Question_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Question&quot;" table="public.&quot;QuestionTags&quot;">
+	<columns names="Question_Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Tag_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Tag&quot;" table="public.&quot;QuestionTags&quot;">
+	<columns names="Tag_Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="&quot;rel_Answer_Question&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;Answer&quot;"
+	 dst-table="public.&quot;Question&quot;" reference-fk="Quesiton_FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="&quot;rel_QuestionComment_Question&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;QuestionComment&quot;"
+	 dst-table="public.&quot;Question&quot;" reference-fk="Question_FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="&quot;rel_QuestionTags_Question&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;QuestionTags&quot;"
+	 dst-table="public.&quot;Question&quot;" reference-fk="Question_FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="&quot;rel_QuestionTags_Tag&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;QuestionTags&quot;"
+	 dst-table="public.&quot;Tag&quot;" reference-fk="Tag_FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="&quot;rel_AnswerComment_Answer&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;AnswerComment&quot;"
+	 dst-table="public.&quot;Answer&quot;" reference-fk="Answer_FK"
+	 src-required="false" dst-required="true"/>
+
+</dbmodel>
