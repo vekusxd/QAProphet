@@ -8,38 +8,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.1.13" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
-      </Content>
-      <Content Include="..\Documents\Diagrams\Db.png">
-        <Link>Documents\Diagrams\Db.png</Link>
-      </Content>
-      <Content Include="..\Documents\Diagrams\UseCase.png">
-        <Link>Documents\Diagrams\UseCase.png</Link>
-      </Content>
-      <Content Include="..\Documents\Diagrams\UseCase.puml">
-        <Link>Documents\Diagrams\UseCase.puml</Link>
-      </Content>
-      <Content Include="..\Documents\Goals.MD">
-        <Link>Documents\Goals.MD</Link>
-      </Content>
-      <Content Include="..\Documents\README.md">
-        <Link>Documents\README.md</Link>
-      </Content>
-      <Content Include="..\Documents\GeneralInformation.md">
-        <Link>Documents\GeneralInformation.md</Link>
-      </Content>
-      <Content Include="..\Documents\UserStory.md">
-        <Link>Documents\UserStory.md</Link>
       </Content>
     </ItemGroup>
     

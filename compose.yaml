@@ -17,12 +17,36 @@
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./initSchema.sql:/docker-entrypoint-initdb.d/init_schema.sql
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: qaDb
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: qaprophet_identity
+    command: start-dev
+    environment:
+      - KC_HEALTH_ENABLED=true
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://db:5432/qaDb
+      - KC_DB_SCHEMA=keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=root
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    depends_on:
+      - db
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    ports:
+      - "18080:8080"
 
 volumes:
   db_data:
-  elasticsearch_data:
+  keycloak-data:
+    
