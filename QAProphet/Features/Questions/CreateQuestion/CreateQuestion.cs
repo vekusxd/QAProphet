@@ -14,7 +14,7 @@ public sealed record CreateQuestionRequest(
     string Title,
     string Content);
 
-public sealed record QuestionResponse(
+public sealed record QuestionDetailsResponse(
     Guid Id,
     string Title,
     string Content,
@@ -30,15 +30,15 @@ public class CreateQuestion : ICarterModule
             .RequireAuthorization()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<QuestionResponse>();
+            .Produces<QuestionDetailsResponse>();
     }
 
-    private static async Task<IResult> Handler(
+    private static async Task<Results<Ok<QuestionDetailsResponse>, ValidationProblem>> Handler(
         [FromBody] CreateQuestionRequest request,
         IValidator<CreateQuestionRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
@@ -63,18 +63,18 @@ internal sealed record CreateQuestionCommand(
     string Description,
     string AuthorId,
     string AuthorName)
-    : IRequest<ErrorOr<QuestionResponse>>;
+    : IRequest<ErrorOr<QuestionDetailsResponse>>;
 
-internal sealed class CreateQuestionCommandHandler : IRequestHandler<CreateQuestionCommand, ErrorOr<QuestionResponse>>
+internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionCommand, ErrorOr<QuestionDetailsResponse>>
 {
     private readonly AppDbContext _dbContext;
 
-    public CreateQuestionCommandHandler(AppDbContext dbContext)
+    public CreateQuestionHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
     
-    public async Task<ErrorOr<QuestionResponse>> Handle(
+    public async Task<ErrorOr<QuestionDetailsResponse>> Handle(
         CreateQuestionCommand request, 
 
         CancellationToken cancellationToken)
@@ -90,6 +90,6 @@ internal sealed class CreateQuestionCommandHandler : IRequestHandler<CreateQuest
         
         await _dbContext.Questions.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return question.MapToResponse();
+        return question.MapToDetailsResponse();
     }
 }

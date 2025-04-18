@@ -17,5 +17,9 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         builder.HasMany(tag => tag.Questions)
             .WithOne(questionTags => questionTags.Tag)
             .HasForeignKey(questionTags => questionTags.TagId);
+        
+        builder.Property(tag => tag.Description)
+            .IsRequired()
+            .HasMaxLength(512);
     }
 }

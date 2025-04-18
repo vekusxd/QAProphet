@@ -33,7 +33,6 @@
     <ItemGroup>
       <Folder Include="Features\Answers\" />
       <Folder Include="Features\Comments\" />
-      <Folder Include="Features\Tags\" />
     </ItemGroup>
     
     
