@@ -10,6 +10,8 @@ public class AnswerConfiguration : IEntityTypeConfiguration<Answer>
     {
         builder.HasKey(answer => answer.Id);
 
+        builder.HasQueryFilter(answer => !answer.IsDeleted);
+
         builder.Property(answer => answer.Content)
             .IsRequired()
             .HasMaxLength(-1);

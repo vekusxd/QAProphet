@@ -32,6 +32,7 @@ public class CreateQuestion : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/questions", Handler)
+            .WithTags(nameof(Question))
             .RequireAuthorization()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -54,7 +55,7 @@ public class CreateQuestion : ICarterModule
         }
 
         var username = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
-        var userId = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "jti")?.Value.Split(':')[1];
+        var userId = claimsPrincipal.GetUserId();
 
         var command = request.MapToCommand(username!, userId!);
         

@@ -9,6 +9,8 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
     public void Configure(EntityTypeBuilder<Tag> builder)
     {
         builder.HasKey(tag => tag.Id);
+        
+        builder.HasQueryFilter(tagComment => !tagComment.IsDeleted);
 
         builder.Property(tag => tag.Title)
             .IsRequired()

@@ -1,7 +1,6 @@
-﻿using QAProphet.Data;
-using QAProphet.Domain;
+﻿using QAProphet.Domain;
 
-namespace QAProphet.Features.Tags.Seed;
+namespace QAProphet.Data;
 
 public class Seed
 {
@@ -16,77 +15,77 @@ public class Seed
     {
         List<Tag> tags =
         [
-            new Tag
+            new()
             {
                 Title = "C#",
                 Description = "Вопросы по языку программирования C# и платформе .NET"
             },
-            new Tag
+            new()
             {
                 Title = "JavaScript",
                 Description = "Вопросы по языку программирования JavaScript и связанным технологиям"
             },
-            new Tag
+            new()
             {
                 Title = "Python",
                 Description = "Вопросы по языку программирования Python и его экосистеме"
             },
-            new Tag
+            new()
             {
                 Title = "SQL",
                 Description = "Вопросы по работе с базами данных и языку запросов SQL"
             },
-            new Tag
+            new()
             {
                 Title = "ASP.NET",
                 Description = "Вопросы по веб-фреймворку ASP.NET и его компонентам"
             },
-            new Tag
+            new()
             {
                 Title = "React",
                 Description = "Вопросы по библиотеке React и разработке пользовательских интерфейсов"
             },
-            new Tag
+            new()
             {
                 Title = "Алгоритмы",
                 Description = "Вопросы по алгоритмам, структурам данных и сложности вычислений"
             },
-            new Tag
+            new()
             {
                 Title = "Git",
                 Description = "Вопросы по системе контроля версий Git и платформам типа GitHub/GitLab"
             },
-            new Tag
+            new()
             {
                 Title = "Docker",
                 Description = "Вопросы по контейнеризации приложений и работе с Docker"
             },
-            new Tag
+            new()
             {
                 Title = "DevOps",
                 Description = "Вопросы по методологиям DevOps и связанным инструментам"
             },
-            new Tag
+            new()
             {
                 Title = "Тестирование",
                 Description = "Вопросы по тестированию программного обеспечения"
             },
-            new Tag
+            new()
             {
                 Title = "HTML/CSS",
                 Description = "Вопросы по вёрстке и стилизации веб-страниц"
             },
-            new Tag
+            new()
             {
                 Title = "Базы данных",
                 Description = "Общие вопросы по проектированию и работе с базами данных"
             },
-            new Tag
+            new()
             {
                 Title = "Linux",
                 Description = "Вопросы по операционной системе Linux и администрированию"
             },
-            new Tag
+            new()
             {
                 Title = "Безопасность",
                 Description = "Вопросы по информационной безопасности и защите данных"

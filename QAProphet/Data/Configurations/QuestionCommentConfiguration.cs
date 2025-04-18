@@ -8,6 +8,8 @@ public class QuestionCommentConfiguration : IEntityTypeConfiguration<QuestionCom
 {
     public void Configure(EntityTypeBuilder<QuestionComment> builder)
     {
+        builder.HasQueryFilter(questionComment => !questionComment.IsDeleted);
+        
         builder.HasKey(questionComment => questionComment.Id);
 
         builder.Property(questionComment => questionComment.Content)

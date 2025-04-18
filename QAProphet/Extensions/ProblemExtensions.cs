@@ -1,5 +1,7 @@
 ﻿using ErrorOr;
 
+namespace QAProphet.Extensions;
+
 public static class EndpointResultsExtensions
 {
     public static IResult ToProblem(this List<Error> errors)
@@ -20,6 +22,7 @@ public static class EndpointResultsExtensions
             ErrorType.Validation => StatusCodes.Status400BadRequest,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
 

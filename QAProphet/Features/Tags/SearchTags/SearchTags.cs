@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Domain;
 
 namespace QAProphet.Features.Tags.SearchTags;
 
@@ -16,6 +17,7 @@ public class SearchTags : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/tags", Handler)
+            .WithTags(nameof(Tag))
             .RequireAuthorization()
             .Produces<List<TagResponse>>()
             .Produces(StatusCodes.Status401Unauthorized);

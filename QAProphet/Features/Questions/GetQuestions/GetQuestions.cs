@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Domain;
 
 namespace QAProphet.Features.Questions.GetQuestions;
 
@@ -18,6 +19,7 @@ public class GetQuestions : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/questions", Handler)
+            .WithTags(nameof(Question))
             .Produces<List<QuestionResponse>>();
     }
 

@@ -9,6 +9,8 @@ public class AnswerCommentConfiguration : IEntityTypeConfiguration<AnswerComment
     public void Configure(EntityTypeBuilder<AnswerComment> builder)
     {
         builder.HasKey(answerComment => answerComment.Id);
+        
+        builder.HasQueryFilter(answerComment => !answerComment.IsDeleted);
 
         builder.Property(answerComment => answerComment.Content)
             .IsRequired()
@@ -17,5 +19,6 @@ public class AnswerCommentConfiguration : IEntityTypeConfiguration<AnswerComment
         builder.HasOne(answerComment => answerComment.Answer)
             .WithMany(answer => answer.Comments)
             .HasForeignKey(answerComment => answerComment.AnswerId);
+        
     }
 }
