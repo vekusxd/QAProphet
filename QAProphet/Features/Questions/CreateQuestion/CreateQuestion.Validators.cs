@@ -8,5 +8,6 @@ public class CreateQuestionRequestValidator : AbstractValidator<CreateQuestionRe
     {
         RuleFor(q => q.Title).NotEmpty().NotNull().MaximumLength(96);
         RuleFor(q => q.Content).NotEmpty().NotNull();
+        RuleFor(q => q.Tags).Must(tags => tags.Count <= 5);
     }
 }

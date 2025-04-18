@@ -5,14 +5,18 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
+using QAProphet.Extensions;
+using QAProphet.Features.Tags.SearchTags;
 
 namespace QAProphet.Features.Questions.CreateQuestion;
 
 public sealed record CreateQuestionRequest(
     string Title,
-    string Content);
+    string Content,
+    List<Guid> Tags);
 
 public sealed record QuestionDetailsResponse(
     Guid Id,
@@ -20,7 +24,8 @@ public sealed record QuestionDetailsResponse(
     string Content,
     DateTime CreatedAt,
     string AuthorName,
-    string AuthorId);
+    string AuthorId,
+    List<TagResponse> Tags);
 
 public class CreateQuestion : ICarterModule
 {
@@ -30,10 +35,11 @@ public class CreateQuestion : ICarterModule
             .RequireAuthorization()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status401Unauthorized)
+            .Produces<string>(StatusCodes.Status400BadRequest)
             .Produces<QuestionDetailsResponse>();
     }
 
-    private static async Task<Results<Ok<QuestionDetailsResponse>, ValidationProblem>> Handler(
+    private static async Task<IResult> Handler(
         [FromBody] CreateQuestionRequest request,
         IValidator<CreateQuestionRequest> validator,
         IMediator mediator,
@@ -54,6 +60,11 @@ public class CreateQuestion : ICarterModule
         
         var response = await mediator.Send(command, cancellationToken);
 
+        if (response.IsError)
+        {
+            return response.Errors.ToProblem();
+        }
+
         return TypedResults.Ok(response.Value);
     }
 }
@@ -62,7 +73,8 @@ internal sealed record CreateQuestionCommand(
     string Title, 
     string Description,
     string AuthorId,
-    string AuthorName)
+    string AuthorName,
+    List<Guid> Tags)
     : IRequest<ErrorOr<QuestionDetailsResponse>>;
 
 internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionCommand, ErrorOr<QuestionDetailsResponse>>
@@ -79,6 +91,16 @@ internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionComm
 
         CancellationToken cancellationToken)
     {
+        var tags = await _dbContext.Tags
+            .AsNoTracking()
+            .Where(t => request.Tags.Contains(t.Id))
+            .ToListAsync(cancellationToken);
+
+        if (tags.Count != request.Tags.Count)
+        {
+            return Error.Validation("TagNotExists", "Some tag not exists");
+        }
+        
         var question = new Question
         {
             Title = request.Title,
@@ -90,6 +112,16 @@ internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionComm
         
         await _dbContext.Questions.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return question.MapToDetailsResponse();
+
+        var questionTags = tags.Select(t => new QuestionTags
+        {
+            QuestionId = question.Id,
+            TagId = t.Id
+        });
+        
+        await _dbContext.QuestionTags.AddRangeAsync(questionTags, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return question.MapToDetailsResponse(tags);
     }
 }

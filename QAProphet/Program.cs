@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using QAProphet;
 using QAProphet.Data;
 using QAProphet.Extensions;
+using QAProphet.Features.Tags.Seed;
 using QAProphet.Options;
 using Scalar.AspNetCore;
 
@@ -34,12 +35,20 @@ builder.Services.AddAuth(builder.Configuration);
 
 builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
+builder.Services.AddScoped<Seed>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<Seed>();
+    await seeder.SeedTags();
 }
 
 app.UseHttpsRedirection();
