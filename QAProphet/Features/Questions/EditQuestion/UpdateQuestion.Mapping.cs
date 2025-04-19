@@ -1,11 +1,11 @@
-﻿using QAProphet.Features.Questions.CreateQuestion;
+﻿using QAProphet.Features.Questions.AskQuestion;
 
-namespace QAProphet.Features.Questions.UpdateQuestion;
+namespace QAProphet.Features.Questions.EditQuestion;
 
 internal static class UpdateQuestionMappingExtensions
 {
     public static UpdateQuestionCommand MapToUpdateCommand(
-        this CreateQuestionRequest request, 
+        this AskQuestionRequest request, 
         Guid questionId,
         Guid userId)
         => new(questionId, request.Title, request.Content, userId, request.Tags);

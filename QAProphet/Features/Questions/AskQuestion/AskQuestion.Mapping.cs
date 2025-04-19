@@ -1,14 +1,13 @@
 ﻿using QAProphet.Domain;
-using QAProphet.Features.Tags.SearchTags;
 
-namespace QAProphet.Features.Questions.CreateQuestion;
+namespace QAProphet.Features.Questions.AskQuestion;
 
 internal static class CreateQuestionMappingExtensions
 {
-    public static CreateQuestionCommand MapToCommand(this CreateQuestionRequest request, string userName, string userId)
+    public static AskQuestionCommand MapToCommand(this AskQuestionRequest request, string userName, string userId)
         => new(request.Title, request.Content, userId, userName, request.Tags);
 
-    public static CreateQuestionResponse MapToCreateResponse(this Question question)
+    public static AskQuestionResponse MapToAskResponse(this Question question)
         => new(question.Id, question.Title, question.Content, question.CreatedAt, question.AuthorName,
             question.QuestionerId.ToString());
 

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
-using QAProphet.Features.Questions.CreateQuestion;
 using QAProphet.Features.Tags.SearchTags;
 
 namespace QAProphet.Features.Questions.GetQuestionDetails;

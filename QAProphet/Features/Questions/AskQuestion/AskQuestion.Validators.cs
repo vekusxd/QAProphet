@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace QAProphet.Features.Questions.CreateQuestion;
+namespace QAProphet.Features.Questions.AskQuestion;
 
-public class CreateQuestionRequestValidator : AbstractValidator<CreateQuestionRequest>
+public class AskQuestionRequestValidator : AbstractValidator<AskQuestionRequest>
 {
-    public CreateQuestionRequestValidator()
+    public AskQuestionRequestValidator()
     {
         RuleFor(q => q.Title).NotEmpty().NotNull().MaximumLength(96);
         RuleFor(q => q.Content).NotEmpty().NotNull();

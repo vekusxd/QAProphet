@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
-using QAProphet.Features.Questions.CreateQuestion;
+using QAProphet.Features.Questions.AskQuestion;
 
-namespace QAProphet.Features.Questions.UpdateQuestion;
+namespace QAProphet.Features.Questions.EditQuestion;
 
 public class UpdateQuestion : ICarterModule
 {
@@ -29,8 +29,8 @@ public class UpdateQuestion : ICarterModule
 
     private static async Task<IResult> Handle(
         Guid id,
-        [FromBody] CreateQuestionRequest request,
-        IValidator<CreateQuestionRequest> validator,
+        [FromBody] AskQuestionRequest request,
+        IValidator<AskQuestionRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken = default)

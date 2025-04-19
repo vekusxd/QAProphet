@@ -3,22 +3,20 @@ using Carter;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
-using QAProphet.Features.Tags.SearchTags;
 
-namespace QAProphet.Features.Questions.CreateQuestion;
+namespace QAProphet.Features.Questions.AskQuestion;
 
-public sealed record CreateQuestionRequest(
+public sealed record AskQuestionRequest(
     string Title,
     string Content,
     List<Guid> Tags);
 
-public sealed record CreateQuestionResponse(
+public sealed record AskQuestionResponse(
     Guid Id,
     string Title,
     string Content,
@@ -26,7 +24,7 @@ public sealed record CreateQuestionResponse(
     string AuthorName,
     string AuthorId);
 
-public class CreateQuestion : ICarterModule
+public class AskQuestion : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -36,12 +34,12 @@ public class CreateQuestion : ICarterModule
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces<string>(StatusCodes.Status400BadRequest)
-            .Produces<CreateQuestionResponse>();
+            .Produces<AskQuestionResponse>();
     }
 
     private static async Task<IResult> Handle(
-        [FromBody] CreateQuestionRequest request,
-        IValidator<CreateQuestionRequest> validator,
+        [FromBody] AskQuestionRequest request,
+        IValidator<AskQuestionRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken = default)
@@ -69,25 +67,25 @@ public class CreateQuestion : ICarterModule
     }
 }
 
-internal sealed record CreateQuestionCommand(
+internal sealed record AskQuestionCommand(
     string Title, 
     string Description,
     string AuthorId,
     string AuthorName,
     List<Guid> Tags)
-    : IRequest<ErrorOr<CreateQuestionResponse>>;
+    : IRequest<ErrorOr<AskQuestionResponse>>;
 
-internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionCommand, ErrorOr<CreateQuestionResponse>>
+internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, ErrorOr<AskQuestionResponse>>
 {
     private readonly AppDbContext _dbContext;
 
-    public CreateQuestionHandler(AppDbContext dbContext)
+    public AskQuestionHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
     
-    public async Task<ErrorOr<CreateQuestionResponse>> Handle(
-        CreateQuestionCommand request, 
+    public async Task<ErrorOr<AskQuestionResponse>> Handle(
+        AskQuestionCommand request, 
 
         CancellationToken cancellationToken)
     {
@@ -122,6 +120,6 @@ internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionComm
         await _dbContext.QuestionTags.AddRangeAsync(questionTags, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return question.MapToCreateResponse();
+        return question.MapToAskResponse();
     }
 }
