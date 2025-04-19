@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
+using QAProphet.Features.Shared.Responses;
 using QAProphet.Features.Tags.SearchTags;
 
 namespace QAProphet.Features.Questions.GetQuestionDetails;
@@ -15,7 +16,9 @@ public sealed record QuestionDetailsResponse(
     string Content,
     DateTime Created,
     DateTime? Updated,
-    List<TagResponse> Tags);
+    List<TagResponse> Tags,
+    List<CommentResponse> Comments,
+    List<AnswerResponse> Answers);
 
 public class GetQuestionDetails : ICarterModule
 {
@@ -61,6 +64,9 @@ internal sealed class GetQuestionDetailsHandler : IRequestHandler<GetQuestionDet
     {
         var question = await _dbContext.Questions
             .AsNoTracking()
+            .Include(q => q.Answers)
+            .ThenInclude(a => a.Comments)
+            .Include(q => q.Comments)
             .Include(q => q.Tags)
             .ThenInclude(t => t.Tag)
             .FirstOrDefaultAsync(q => q.Id == request.QuestionId, cancellationToken);

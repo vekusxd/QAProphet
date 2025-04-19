@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QAProphet.Data;
@@ -11,9 +12,11 @@ using QAProphet.Data;
 namespace QAProphet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250419105728_AnswerAuthorName")]
+    partial class AnswerAuthorName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,11 +80,6 @@ namespace QAProphet.Migrations
 
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("AuthorName")
-                        .IsRequired()
-                        .HasMaxLength(96)
-                        .HasColumnType("character varying(96)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -152,11 +150,6 @@ namespace QAProphet.Migrations
 
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("AuthorName")
-                        .IsRequired()
-                        .HasMaxLength(96)
-                        .HasColumnType("character varying(96)");
 
                     b.Property<string>("Content")
                         .IsRequired()

@@ -11,6 +11,10 @@ public class QuestionCommentConfiguration : IEntityTypeConfiguration<QuestionCom
         builder.HasQueryFilter(questionComment => !questionComment.IsDeleted);
         
         builder.HasKey(questionComment => questionComment.Id);
+        
+        builder.Property(questionComment => questionComment.AuthorName)
+            .IsRequired()
+            .HasMaxLength(96);
 
         builder.Property(questionComment => questionComment.Content)
             .IsRequired()

@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Answers\PostAnswer\" />
       <Folder Include="Features\Comments\" />
     </ItemGroup>
     

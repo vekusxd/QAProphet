@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
+using QAProphet.Features.Shared.Responses;
 
 namespace QAProphet.Features.Tags.SearchTags;
 
-public sealed record TagResponse(
-    Guid Id,
-    string Title);
 
 public class SearchTags : ICarterModule
 {

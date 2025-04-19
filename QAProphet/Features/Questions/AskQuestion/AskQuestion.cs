@@ -51,7 +51,7 @@ public class AskQuestion : ICarterModule
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
         }
 
-        var username = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
+        var username = claimsPrincipal.GetUserName();
         var userId = claimsPrincipal.GetUserId();
 
         var command = request.MapToCommand(username!, userId!);

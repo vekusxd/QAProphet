@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
+using QAProphet.Features.Shared.Responses;
 
 namespace QAProphet.Features.Questions.GetQuestions;
 
@@ -12,7 +13,8 @@ public sealed record QuestionResponse(
     Guid Id,
     string Title,
     DateTime CreatedAt,
-    string AuthorName);
+    string AuthorName, 
+    List<TagResponse> Tags);
 
 public class GetQuestions : ICarterModule
 {
@@ -63,12 +65,15 @@ internal sealed class GetQuestionsHandler : IRequestHandler<GetQuestionsQuery, L
 
         var questions = await _dbContext.Questions
             .AsNoTracking()
+            .Include(q => q.Tags)
+            .ThenInclude(q => q.Tag)
             .OrderByDescending(x => x.CreatedAt)
             .Skip(skip)
             .Take(request.PageSize)
-            .Select(c => c.MapToResponse())
             .ToListAsync(cancellationToken);
 
-        return questions;
+        return questions
+            .Select(q => q.MapToResponse())
+            .ToList();
     }
 }

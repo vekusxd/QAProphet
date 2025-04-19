@@ -12,6 +12,10 @@ public class AnswerConfiguration : IEntityTypeConfiguration<Answer>
 
         builder.HasQueryFilter(answer => !answer.IsDeleted);
 
+        builder.Property(answer => answer.AuthorName)
+            .IsRequired()
+            .HasMaxLength(96);
+
         builder.Property(answer => answer.Content)
             .IsRequired()
             .HasMaxLength(-1);

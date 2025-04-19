@@ -1,4 +1,5 @@
 ﻿using QAProphet.Domain;
+using QAProphet.Features.Shared.Responses;
 
 namespace QAProphet.Features.Tags.SearchTags;
 
