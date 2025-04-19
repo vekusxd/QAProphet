@@ -5,14 +5,13 @@ using QAProphet.Options;
 
 namespace QAProphet.Extensions;
 
-
-internal  static class AddAuthExtension
+internal static class AddAuthExtension
 {
     public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
         var authOptions = configuration.GetRequiredSection(AuthOptions.Section).Get<AuthOptions>() ??
                           throw new Exception($"Missing {AuthOptions.Section} configuration section");
-        
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
             {
@@ -22,6 +21,23 @@ internal  static class AddAuthExtension
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = authOptions.ValidIssuer,
+                };
+
+                o.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/hubs")))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
         services.AddAuthorization();

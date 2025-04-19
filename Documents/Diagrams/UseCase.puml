@@ -21,6 +21,9 @@ usecase (Управление пользователями) as UC11
 usecase (Модерация контента) as UC12
 usecase (Рассмотрение жалоб) as UC13
 
+usecase (Подписаться на тег) AS UC14
+usecase (Подписаться на вопрос) AS UC15
+
 Questioner --> UC1
 Questioner --> UC2
 Questioner --> UC3
@@ -29,10 +32,12 @@ Questioner --> UC5
 Questioner --> UC6
 Questioner --> UC7
 Questioner --> UC8
+Questioner --> UC15
 
 Answerer -up-> UC2
 Answerer -up-> UC3
 Answerer -up-> UC7
+Answerer --> UC14
 Answerer --> UC9
 Answerer --> UC10
 
