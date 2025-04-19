@@ -18,12 +18,12 @@ public class GetQuestions : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/questions", Handler)
+        app.MapGet("/api/questions", Handle)
             .WithTags(nameof(Question))
             .Produces<List<QuestionResponse>>();
     }
 
-    private static async Task<Ok<List<QuestionResponse>>> Handler(
+    private static async Task<Ok<List<QuestionResponse>>> Handle(
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         IMediator mediator,

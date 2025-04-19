@@ -13,7 +13,7 @@ public class DeleteQuestion : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/questions/{id:guid}", Handler)
+        app.MapDelete("/api/questions/{id:guid}", Handle)
             .WithTags(nameof(Question))
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
@@ -22,7 +22,7 @@ public class DeleteQuestion : ICarterModule
             .Produces(StatusCodes.Status404NotFound);
     }
 
-    private static async Task<IResult> Handler(
+    private static async Task<IResult> Handle(
         Guid id,
         IMediator mediator,
         ClaimsPrincipal principal,

@@ -4,6 +4,7 @@ public class Question : BaseEntity
 {
     public required string Title { get; set; }
     public required string Content { get; set; }
+    public DateTime? UpdateTime { get; set; }
     public required  Guid QuestionerId { get; init; }
     public required string AuthorName { get; set; }
     public ICollection<Answer> Answers { get; set; } = [];

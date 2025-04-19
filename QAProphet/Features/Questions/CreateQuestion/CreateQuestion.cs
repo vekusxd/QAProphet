@@ -18,29 +18,28 @@ public sealed record CreateQuestionRequest(
     string Content,
     List<Guid> Tags);
 
-public sealed record QuestionDetailsResponse(
+public sealed record CreateQuestionResponse(
     Guid Id,
     string Title,
     string Content,
     DateTime CreatedAt,
     string AuthorName,
-    string AuthorId,
-    List<TagResponse> Tags);
+    string AuthorId);
 
 public class CreateQuestion : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/questions", Handler)
+        app.MapPost("/api/questions", Handle)
             .WithTags(nameof(Question))
             .RequireAuthorization()
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces<string>(StatusCodes.Status400BadRequest)
-            .Produces<QuestionDetailsResponse>();
+            .Produces<CreateQuestionResponse>();
     }
 
-    private static async Task<IResult> Handler(
+    private static async Task<IResult> Handle(
         [FromBody] CreateQuestionRequest request,
         IValidator<CreateQuestionRequest> validator,
         IMediator mediator,
@@ -76,9 +75,9 @@ internal sealed record CreateQuestionCommand(
     string AuthorId,
     string AuthorName,
     List<Guid> Tags)
-    : IRequest<ErrorOr<QuestionDetailsResponse>>;
+    : IRequest<ErrorOr<CreateQuestionResponse>>;
 
-internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionCommand, ErrorOr<QuestionDetailsResponse>>
+internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionCommand, ErrorOr<CreateQuestionResponse>>
 {
     private readonly AppDbContext _dbContext;
 
@@ -87,7 +86,7 @@ internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionComm
         _dbContext = dbContext;
     }
     
-    public async Task<ErrorOr<QuestionDetailsResponse>> Handle(
+    public async Task<ErrorOr<CreateQuestionResponse>> Handle(
         CreateQuestionCommand request, 
 
         CancellationToken cancellationToken)
@@ -123,6 +122,6 @@ internal sealed class CreateQuestionHandler : IRequestHandler<CreateQuestionComm
         await _dbContext.QuestionTags.AddRangeAsync(questionTags, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return question.MapToDetailsResponse(tags);
+        return question.MapToCreateResponse();
     }
 }

@@ -16,14 +16,12 @@ public class SearchTags : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/tags", Handler)
+        app.MapGet("/api/tags", Handle)
             .WithTags(nameof(Tag))
-            .RequireAuthorization()
-            .Produces<List<TagResponse>>()
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces<List<TagResponse>>();
     }
 
-    private static async Task<Ok<List<TagResponse>>> Handler(
+    private static async Task<Ok<List<TagResponse>>> Handle(
         [FromQuery] string term,
         IMediator mediator,
         CancellationToken cancellationToken = default)
