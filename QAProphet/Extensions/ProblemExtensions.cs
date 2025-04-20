@@ -26,7 +26,12 @@ public static class EndpointResultsExtensions
             _ => StatusCodes.Status500InternalServerError
         };
 
-        return Results.ValidationProblem(errors.ToDictionary(k => k.Code, v => new[] { v.Description }),
-            statusCode: statusCode);
+        return statusCode switch
+        {
+            StatusCodes.Status409Conflict => Results.Conflict("Время для удаления истекло"),
+            StatusCodes.Status403Forbidden => Results.Forbid(),
+            _ => Results.ValidationProblem(errors.ToDictionary(k => k.Code, v => new[] { v.Description }),
+                statusCode: statusCode)
+        };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using QAProphet.Extensions;
 
 namespace QAProphet.Features.Answers.PostAnswer;
 
@@ -8,16 +9,16 @@ public class PostAnswerRequestValidator : AbstractValidator<PostAnswerRequest>
     {
         RuleFor(r => r.Content)
             .NotEmpty()
-            .NotNull();
+            .WithMessage("Содержание обязательно")
+            .NotNull()
+            .WithMessage("Содержание обязательно");
         
         RuleFor(r => r.QuestionId)
             .NotEmpty()
+            .WithMessage("ID сообщения обязательно")
             .NotNull()
-            .Must(BeValidGuid);
-    }
-
-    private static bool BeValidGuid(string id)
-    {
-        return Guid.TryParse(id, out var guid);
+            .WithMessage("ID сообщения обязательно")
+            .Must(s => s.IsGuid())
+            .WithMessage("Сообщение должно быть в виде UUID");
     }
 }

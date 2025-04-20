@@ -8,5 +8,5 @@ internal static class UpdateQuestionMappingExtensions
         this AskQuestionRequest request, 
         Guid questionId,
         Guid userId)
-        => new(questionId, request.Title, request.Content, userId, request.Tags);
+        => new(questionId, request.Title, request.Content, userId, request.Tags.Select(Guid.Parse).ToList());
 }

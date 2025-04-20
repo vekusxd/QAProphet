@@ -14,7 +14,7 @@ namespace QAProphet.Features.Questions.AskQuestion;
 public sealed record AskQuestionRequest(
     string Title,
     string Content,
-    List<Guid> Tags);
+    List<string> Tags);
 
 public sealed record AskQuestionResponse(
     Guid Id,
