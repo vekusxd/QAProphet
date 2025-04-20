@@ -31,7 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Comments\" />
+      <Folder Include="Features\Comments\AnswerComments\CreateAnswerComment\" />
     </ItemGroup>
     
     
