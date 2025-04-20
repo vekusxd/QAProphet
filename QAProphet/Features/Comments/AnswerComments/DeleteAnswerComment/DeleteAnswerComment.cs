@@ -7,14 +7,14 @@ using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 
-namespace QAProphet.Features.Comments.QuestionComments.DeleteQuestionComment;
+namespace QAProphet.Features.Comments.AnswerComments.DeleteAnswerComment;
 
-public class DeleteQuestionComment : ICarterModule
+public class DeleteAnswerComment : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/questions/comments/{commentId:guid}", Handle)
-            .WithTags(nameof(Question))
+        app.MapDelete("/api/answers/comments/{commentId:guid}", Handle)
+            .WithTags(nameof(Answer))
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -25,13 +25,13 @@ public class DeleteQuestionComment : ICarterModule
 
     private static async Task<IResult> Handle(
         Guid commentId,
-        IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
+        IMediator mediator,
         CancellationToken cancellationToken = default)
     {
         var userId = claimsPrincipal.GetUserId();
         
-        var deleteCommand = new DeleteQuestionCommentCommand(commentId, Guid.Parse(userId!));
+        var deleteCommand = new DeleteAnswerCommentCommand(commentId, Guid.Parse(userId!));
         
         var result = await mediator.Send(deleteCommand, cancellationToken);
 
@@ -39,28 +39,28 @@ public class DeleteQuestionComment : ICarterModule
         {
             return result.Errors.ToProblem();
         }
-        
+
         return Results.NoContent();
     }
 }
 
-internal sealed record DeleteQuestionCommentCommand(
+internal sealed record DeleteAnswerCommentCommand(
     Guid CommentId,
-    Guid UserId)
-    : IRequest<ErrorOr<bool>>;
+    Guid UserId
+) : IRequest<ErrorOr<bool>>;
 
-internal sealed class DeleteQuestionCommentHandler : IRequestHandler<DeleteQuestionCommentCommand, ErrorOr<bool>>
+internal sealed class DeleteAnswerCommentHandler : IRequestHandler<DeleteAnswerCommentCommand, ErrorOr<bool>>
 {
     private readonly AppDbContext _dbContext;
 
-    public DeleteQuestionCommentHandler(AppDbContext dbContext)
+    public DeleteAnswerCommentHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<ErrorOr<bool>> Handle(DeleteQuestionCommentCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> Handle(DeleteAnswerCommentCommand request, CancellationToken cancellationToken)
     {
-        var comment = await _dbContext.QuestionComments
+        var comment = await _dbContext.AnswerComments
             .SingleOrDefaultAsync(q => q.Id == request.CommentId, cancellationToken);
 
         if (comment is null)
@@ -79,7 +79,7 @@ internal sealed class DeleteQuestionCommentHandler : IRequestHandler<DeleteQuest
         }
 
         comment.IsDeleted = true;
-        _dbContext.QuestionComments.Update(comment);
+        _dbContext.AnswerComments.Update(comment);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }
