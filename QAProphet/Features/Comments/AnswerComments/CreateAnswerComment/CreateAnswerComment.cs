@@ -11,23 +11,23 @@ using QAProphet.Features.Comments.Shared.Requests;
 using QAProphet.Features.Shared.Mappings;
 using QAProphet.Features.Shared.Responses;
 
-namespace QAProphet.Features.Comments.QuestionComments.CreateQuestionComment;
+namespace QAProphet.Features.Comments.AnswerComments.CreateAnswerComment;
 
-public class CreateQuestionComment : ICarterModule
+public class CreateAnswerComment : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/questions/comments/{questionId:guid}", Handle)
-            .WithTags(nameof(Question))
+        app.MapPost("/api/answers/comments/{answerId:guid}", Handle)
+            .WithTags(nameof(Answer))
             .RequireAuthorization()
-            .Produces(StatusCodes.Status401Unauthorized)
-            .Produces(StatusCodes.Status404NotFound)
             .Produces<CommentResponse>()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem();
     }
 
     private static async Task<IResult> Handle(
-        Guid questionId,
+        Guid answerId,
         CreateCommentRequest request,
         IValidator<CreateCommentRequest> validator,
         IMediator mediator,
@@ -40,11 +40,11 @@ public class CreateQuestionComment : ICarterModule
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-
+        
         var username = claimsPrincipal.GetUserName();
         var userId = claimsPrincipal.GetUserId();
-
-        var command = new CreateQuestionCommentCommand(Guid.Parse(userId!), questionId, username!, request.Content);
+        
+        var command = new CreateAnswerCommentCommand(Guid.Parse(userId!), answerId, username!, request.Content);
         
         var result = await mediator.Send(command, token);
 
@@ -52,50 +52,48 @@ public class CreateQuestionComment : ICarterModule
         {
             return result.Errors.ToProblem();
         }
-        
+
         return Results.Ok(result.Value);
     }
 }
 
-internal sealed record CreateQuestionCommentCommand(
+internal sealed record CreateAnswerCommentCommand(
     Guid AuthorId,
-    Guid QuestionId,
+    Guid AnswerId,
     string AuthorName,
     string Content)
     : IRequest<ErrorOr<CommentResponse>>;
 
-internal sealed class
-    CreateQuestionCommentHandler : IRequestHandler<CreateQuestionCommentCommand, ErrorOr<CommentResponse>>
+internal sealed class CreateAnswerCommentHandler : IRequestHandler<CreateAnswerCommentCommand, ErrorOr<CommentResponse>>
 {
     private readonly AppDbContext _dbContext;
 
-    public CreateQuestionCommentHandler(AppDbContext dbContext)
+    public CreateAnswerCommentHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<ErrorOr<CommentResponse>> Handle(CreateQuestionCommentCommand request,
+    public async Task<ErrorOr<CommentResponse>> Handle(CreateAnswerCommentCommand request,
         CancellationToken cancellationToken)
     {
-        var question = await _dbContext.Questions
-            .AnyAsync(q => q.Id == request.QuestionId, cancellationToken);
+        var answer = await _dbContext.Answers.AnyAsync(a => a.Id == request.AnswerId, cancellationToken);
 
-        if (!question)
+        if (!answer)
         {
-            return Error.NotFound("QuestionNotFound", "Question not found");
+            return Error.NotFound("AnswerNotFound", "Answer not found");
         }
 
-        var comment = new QuestionComment
+        var comment = new AnswerComment
         {
             AuthorId = request.AuthorId,
             AuthorName = request.AuthorName,
             Content = request.Content,
             CreatedAt = DateTime.UtcNow,
-            QuestionId = request.QuestionId,
+            AnswerId = request.AnswerId,
             IsDeleted = false
         };
-
-        await _dbContext.QuestionComments.AddAsync(comment, cancellationToken);
+        
+        await _dbContext.AnswerComments.AddAsync(comment, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return comment.MapToResponse();
