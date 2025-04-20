@@ -29,6 +29,12 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Features\Comments\AnswerComments\DeleteAnswerComment\" />
+      <Folder Include="Features\Comments\AnswerComments\UpdateAnswerComment\" />
+      <Folder Include="Features\Comments\QuestionComments\DeleteQuestonComment\" />
+    </ItemGroup>
     
     
 

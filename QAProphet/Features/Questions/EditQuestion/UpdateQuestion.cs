@@ -3,7 +3,6 @@ using Carter;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
 using QAProphet.Domain;
@@ -29,7 +28,7 @@ public class UpdateQuestion : ICarterModule
 
     private static async Task<IResult> Handle(
         Guid id,
-        [FromBody] AskQuestionRequest request,
+        AskQuestionRequest request,
         IValidator<AskQuestionRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
@@ -39,7 +38,7 @@ public class UpdateQuestion : ICarterModule
 
         if (!validationResult.IsValid)
         {
-            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+            return Results.ValidationProblem(validationResult.ToDictionary());
         }
         
         var userId = claimsPrincipal.GetUserId();
@@ -53,7 +52,7 @@ public class UpdateQuestion : ICarterModule
             return result.Errors.ToProblem();
         }
         
-        return TypedResults.NoContent();
+        return Results.NoContent();
     }
 }
 

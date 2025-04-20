@@ -19,6 +19,10 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.Property(question => question.Content)
             .IsRequired()
             .HasMaxLength(-1);
+        
+        builder.Property(question => question.AuthorName)
+            .IsRequired()
+            .HasMaxLength(128);
 
         builder.HasMany(question => question.Answers)
             .WithOne(answer => answer.Question)

@@ -14,6 +14,8 @@ public sealed record QuestionDetailsResponse(
     Guid Id,
     string Title,
     string Content,
+    Guid AuthorId,
+    string AuthorName,
     DateTime Created,
     DateTime? Updated,
     List<TagResponse> Tags,
