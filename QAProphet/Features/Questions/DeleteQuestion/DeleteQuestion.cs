@@ -78,7 +78,7 @@ internal sealed class DeleteQuestionHandler : IRequestHandler<DeleteQuestionComm
         }
         
         question.IsDeleted = true;
-        _dbContext.Update(question);
+        _dbContext.Questions.Update(question);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }
