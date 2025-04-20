@@ -28,8 +28,8 @@ public class CreateAnswerComment : ICarterModule
 
     private static async Task<IResult> Handle(
         Guid answerId,
-        CreateCommentRequest request,
-        IValidator<CreateCommentRequest> validator,
+        CommentRequest request,
+        IValidator<CommentRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
         CancellationToken token = default)

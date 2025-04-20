@@ -30,8 +30,8 @@ public class UpdateQuestionComment : ICarterModule
 
     private static async Task<IResult> Handle(
         Guid commentId,
-        CreateCommentRequest request,
-        IValidator<CreateCommentRequest> validator,
+        CommentRequest request,
+        IValidator<CommentRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken = default)

@@ -4,7 +4,7 @@ using QAProphet.Features.Comments.Shared.Requests;
 
 namespace QAProphet.Features.Comments.Shared.Validators;
 
-public class CreateCommentRequestValidator : AbstractValidator<CreateCommentRequest>
+public class CreateCommentRequestValidator : AbstractValidator<CommentRequest>
 {
     public CreateCommentRequestValidator()
     {

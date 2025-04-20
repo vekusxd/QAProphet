@@ -1,3 +1,3 @@
 ﻿namespace QAProphet.Features.Comments.Shared.Requests;
 
-public sealed record CreateCommentRequest(string Content);
+public sealed record CommentRequest(string Content);
