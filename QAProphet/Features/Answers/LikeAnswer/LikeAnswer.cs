@@ -26,13 +26,14 @@ public class LikeAnswer : ICarterModule
     private static async Task<IResult> Handle(
         Guid answerId,
         ClaimsPrincipal claimsPrincipal,
-        IMediator mediator)
+        IMediator mediator,
+        CancellationToken cancellationToken = default)
     {
         var userId = claimsPrincipal.GetUserId();
         
         var command = new LikeAnswerCommand(answerId, Guid.Parse(userId!));
         
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command, cancellationToken);
 
         if (result.IsError)
         {
