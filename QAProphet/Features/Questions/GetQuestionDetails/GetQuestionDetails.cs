@@ -78,6 +78,8 @@ internal sealed class GetQuestionDetailsHandler : IRequestHandler<GetQuestionDet
             return Error.NotFound("QuestionNotFound", "Question not found");
         }
 
+        question.Answers = question.Answers.OrderByDescending(a => a.IsBest).ToList();
+
         return question.MapToDetailsResponse();
     }
 }
