@@ -38,7 +38,7 @@ public class AskQuestion : ICarterModule
     }
 
     private static async Task<IResult> Handle(
-        [FromBody] AskQuestionRequest request,
+        AskQuestionRequest request,
         IValidator<AskQuestionRequest> validator,
         IMediator mediator,
         ClaimsPrincipal claimsPrincipal,

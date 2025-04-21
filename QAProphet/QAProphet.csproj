@@ -29,6 +29,10 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Features\Answers\EditAnswer\" />
+    </ItemGroup>
     
     
 

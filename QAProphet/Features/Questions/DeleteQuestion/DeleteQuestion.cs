@@ -74,7 +74,7 @@ internal sealed class DeleteQuestionHandler : IRequestHandler<DeleteQuestionComm
 
         if (DateTime.UtcNow - question.CreatedAt > TimeSpan.FromHours(1))
         {
-            return Error.Conflict("Time expired", "time for delete expired");
+            return Error.Conflict("TimeExpired", "time for delete expired");
         }
         
         question.IsDeleted = true;

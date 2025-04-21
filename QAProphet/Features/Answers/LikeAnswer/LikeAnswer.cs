@@ -15,8 +15,8 @@ public class LikeAnswer : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/answers/{answerId:guid}/like", Handle)
-            .WithTags(nameof(AnswerLike))
+        app.MapPatch("/api/answers/{answerId:guid}/like", Handle)
+            .WithTags(nameof(Answer))
             .RequireAuthorization()
             .Produces<AnswerUpdateResponse>()
             .Produces(StatusCodes.Status404NotFound)
