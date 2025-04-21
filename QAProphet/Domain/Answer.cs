@@ -9,6 +9,7 @@ public class Answer : BaseEntity
     public Question Question { get; init; } = null!;
     public int Likes { get; set; } = 0;
     public bool IsBest { get; set; } = false;
+    public DateTime? UpdatedAt { get; set; }
     public ICollection<AnswerComment> Comments { get; set; } = [];
     public ICollection<AnswerLike> AnswerLikes { get; set; } = [];
 }

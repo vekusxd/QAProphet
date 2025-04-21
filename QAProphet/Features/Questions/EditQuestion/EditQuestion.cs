@@ -11,7 +11,7 @@ using QAProphet.Features.Questions.AskQuestion;
 
 namespace QAProphet.Features.Questions.EditQuestion;
 
-public class UpdateQuestion : ICarterModule
+public class EditQuestion : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -56,7 +56,7 @@ public class UpdateQuestion : ICarterModule
     }
 }
 
-internal sealed record UpdateQuestionCommand(
+internal sealed record EditQuestionCommand(
     Guid QuestionId,
     string Title,
     string Content,
@@ -64,16 +64,16 @@ internal sealed record UpdateQuestionCommand(
     List<Guid> Tags)
     : IRequest<ErrorOr<bool>>;
 
-internal sealed class UpdateQuestionHandler : IRequestHandler<UpdateQuestionCommand, ErrorOr<bool>>
+internal sealed class EditQuestionHandler : IRequestHandler<EditQuestionCommand, ErrorOr<bool>>
 {
     private readonly AppDbContext _dbContext;
 
-    public UpdateQuestionHandler(AppDbContext dbContext)
+    public EditQuestionHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
     
-    public async Task<ErrorOr<bool>> Handle(UpdateQuestionCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> Handle(EditQuestionCommand request, CancellationToken cancellationToken)
     {
         var question =
             await _dbContext.Questions.FirstOrDefaultAsync(q => q.Id == request.QuestionId, cancellationToken);

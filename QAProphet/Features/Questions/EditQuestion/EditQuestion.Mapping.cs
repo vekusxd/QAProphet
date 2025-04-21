@@ -2,9 +2,9 @@
 
 namespace QAProphet.Features.Questions.EditQuestion;
 
-internal static class UpdateQuestionMappingExtensions
+internal static class EditQuestionMappingExtensions
 {
-    public static UpdateQuestionCommand MapToUpdateCommand(
+    public static EditQuestionCommand MapToUpdateCommand(
         this AskQuestionRequest request, 
         Guid questionId,
         Guid userId)
