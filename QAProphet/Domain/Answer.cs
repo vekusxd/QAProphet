@@ -8,7 +8,7 @@ public class Answer : BaseEntity
     public Guid QuestionId { get; init; }
     public Question Question { get; init; } = null!;
     public int Likes { get; set; } = 0;
-    public int Dislikes { get; set; } = 0;
     public bool IsBest { get; set; } = false;
     public ICollection<AnswerComment> Comments { get; set; } = [];
+    public ICollection<AnswerLike> AnswerLikes { get; set; } = [];
 }

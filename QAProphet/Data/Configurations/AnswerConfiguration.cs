@@ -27,5 +27,9 @@ public class AnswerConfiguration : IEntityTypeConfiguration<Answer>
         builder.HasMany(answer => answer.Comments)
             .WithOne(answerComment => answerComment.Answer)
             .HasForeignKey(answerComment => answerComment.AnswerId);
+        
+        builder.HasMany(answer => answer.AnswerLikes)
+            .WithOne(answerLike => answerLike.Answer)
+            .HasForeignKey(answerLike => answerLike.AnswerId);
     }
 }

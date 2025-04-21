@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<AnswerComment> AnswerComments { get; set; }
     public DbSet<QuestionComment> QuestionComments { get; set; }
     public DbSet<QuestionTags> QuestionTags { get; set; }
+    public DbSet<AnswerLike> AnswerLikes { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

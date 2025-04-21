@@ -100,7 +100,6 @@ internal sealed record PostAnswerHandler : IRequestHandler<PostAnswerCommand, Er
             CreatedAt = DateTime.UtcNow,
             QuestionId = request.QuestionId,
             Likes = 0,
-            Dislikes = 0,
             IsBest = false
         };
         

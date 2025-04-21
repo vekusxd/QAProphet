@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
-using QAProphet.Features.Comments.QuestionComments.CreateQuestionComment;
 using QAProphet.Features.Comments.Shared.Requests;
 
 namespace QAProphet.Features.Comments.Shared.Validators;
 
-public class CreateCommentRequestValidator : AbstractValidator<CommentRequest>
+public class CommentRequestValidator : AbstractValidator<CommentRequest>
 {
-    public CreateCommentRequestValidator()
+    public CommentRequestValidator()
     {
         RuleFor(c => c.Content)
             .NotNull()

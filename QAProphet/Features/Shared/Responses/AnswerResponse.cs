@@ -7,4 +7,5 @@ public record AnswerResponse(
     Guid AuthorId,
     string AuthorName,
     List<CommentResponse> Comments,
-    bool IsSolution);
+    bool IsSolution,
+    int Likes);

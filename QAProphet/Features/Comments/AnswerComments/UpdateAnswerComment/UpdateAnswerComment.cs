@@ -18,7 +18,7 @@ public class UpdateAnswerComment : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPut("/api/answers/comments/{commentId:guid}", Handle)
-            .WithTags(nameof(Answer))
+            .WithTags(nameof(AnswerComment))
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()

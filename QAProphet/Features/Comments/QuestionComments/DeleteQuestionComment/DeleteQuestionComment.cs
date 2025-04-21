@@ -14,7 +14,7 @@ public class DeleteQuestionComment : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete("/api/questions/comments/{commentId:guid}", Handle)
-            .WithTags(nameof(Question))
+            .WithTags(nameof(QuestionComment))
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)

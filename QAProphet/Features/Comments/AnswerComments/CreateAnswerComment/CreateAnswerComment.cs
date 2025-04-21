@@ -18,7 +18,7 @@ public class CreateAnswerComment : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/answers/comments/{answerId:guid}", Handle)
-            .WithTags(nameof(Answer))
+            .WithTags(nameof(AnswerComment))
             .RequireAuthorization()
             .Produces<CommentResponse>()
             .Produces(StatusCodes.Status404NotFound)

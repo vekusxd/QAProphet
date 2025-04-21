@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QAProphet.Data;
@@ -11,9 +12,11 @@ using QAProphet.Data;
 namespace QAProphet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250420121720_RemoveDislikeFieldFromComment")]
+    partial class RemoveDislikeFieldFromComment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,6 +46,9 @@ namespace QAProphet.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Dislikes")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsBest")
                         .HasColumnType("boolean");
@@ -91,6 +97,9 @@ namespace QAProphet.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("Likes")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -99,31 +108,6 @@ namespace QAProphet.Migrations
                     b.HasIndex("AnswerId");
 
                     b.ToTable("AnswerComments");
-                });
-
-            modelBuilder.Entity("QAProphet.Domain.AnswerLike", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AnswerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnswerId");
-
-                    b.ToTable("AnswerLikes");
                 });
 
             modelBuilder.Entity("QAProphet.Domain.Question", b =>
@@ -188,6 +172,9 @@ namespace QAProphet.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("Likes")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
@@ -281,17 +268,6 @@ namespace QAProphet.Migrations
                     b.Navigation("Answer");
                 });
 
-            modelBuilder.Entity("QAProphet.Domain.AnswerLike", b =>
-                {
-                    b.HasOne("QAProphet.Domain.Answer", "Answer")
-                        .WithMany("AnswerLikes")
-                        .HasForeignKey("AnswerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Answer");
-                });
-
             modelBuilder.Entity("QAProphet.Domain.QuestionComment", b =>
                 {
                     b.HasOne("QAProphet.Domain.Question", "Question")
@@ -324,8 +300,6 @@ namespace QAProphet.Migrations
 
             modelBuilder.Entity("QAProphet.Domain.Answer", b =>
                 {
-                    b.Navigation("AnswerLikes");
-
                     b.Navigation("Comments");
                 });
 
