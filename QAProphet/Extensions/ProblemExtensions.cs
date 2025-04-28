@@ -35,4 +35,9 @@ public static class EndpointResultsExtensions
                 statusCode: statusCode)
         };
     }
+
+    public static IResult ToProblem(this Error error)
+    {
+        return CreateProblem([error]);
+    }
 }
