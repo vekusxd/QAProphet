@@ -10,4 +10,6 @@ public class Question : BaseEntity
     public ICollection<Answer> Answers { get; set; } = [];
     public ICollection<QuestionComment> Comments { get; set; } = [];
     public ICollection<QuestionTags> Tags { get; set; } = [];
+    public ICollection<QuestionSubscribe> Subscribers { get; set; } = [];
+    public ICollection<QuestionComplaint> Complaints { get; set; } = [];
 }

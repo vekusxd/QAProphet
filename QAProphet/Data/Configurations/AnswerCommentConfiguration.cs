@@ -12,15 +12,18 @@ public class AnswerCommentConfiguration : IEntityTypeConfiguration<AnswerComment
         
         builder.HasQueryFilter(answerComment => !answerComment.IsDeleted);
         
-        builder.Property(answerComment => answerComment.AuthorName)
+        builder
+            .Property(answerComment => answerComment.AuthorName)
             .IsRequired()
             .HasMaxLength(96);
 
-        builder.Property(answerComment => answerComment.Content)
+        builder
+            .Property(answerComment => answerComment.Content)
             .IsRequired()
             .HasMaxLength(-1);
         
-        builder.HasOne(answerComment => answerComment.Answer)
+        builder
+            .HasOne(answerComment => answerComment.Answer)
             .WithMany(answer => answer.Comments)
             .HasForeignKey(answerComment => answerComment.AnswerId);
         

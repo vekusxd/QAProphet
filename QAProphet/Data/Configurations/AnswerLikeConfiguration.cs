@@ -12,7 +12,8 @@ public class AnswerLikeConfiguration : IEntityTypeConfiguration<AnswerLike>
         
         builder.HasQueryFilter(answerLike => !answerLike.IsDeleted);
         
-        builder.HasOne(answerLike => answerLike.Answer)
+        builder
+            .HasOne(answerLike => answerLike.Answer)
             .WithMany(answer => answer.AnswerLikes)
             .HasForeignKey(answerLike => answerLike.AnswerId);
     }

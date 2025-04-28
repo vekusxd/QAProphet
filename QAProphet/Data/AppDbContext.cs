@@ -12,7 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<QuestionComment> QuestionComments { get; set; }
     public DbSet<QuestionTags> QuestionTags { get; set; }
     public DbSet<AnswerLike> AnswerLikes { get; set; }
-    
+    public DbSet<TagSubscribe> TagSubscribes { get; set; }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }

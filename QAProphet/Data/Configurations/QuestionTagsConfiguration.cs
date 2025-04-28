@@ -12,11 +12,13 @@ public class QuestionTagsConfiguration : IEntityTypeConfiguration<QuestionTags>
         
         builder.HasQueryFilter(questionTags => !questionTags.IsDeleted);
 
-        builder.HasOne(questionTags => questionTags.Tag)
+        builder
+            .HasOne(questionTags => questionTags.Tag)
             .WithMany(tag => tag.Questions)
             .HasForeignKey(q => q.TagId);
 
-        builder.HasOne(questionTags => questionTags.Question)
+        builder
+            .HasOne(questionTags => questionTags.Question)
             .WithMany(question => question.Tags)
             .HasForeignKey(questionTags => questionTags.QuestionId);
     }

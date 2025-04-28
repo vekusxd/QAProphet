@@ -12,4 +12,5 @@ public class Answer : BaseEntity
     public DateTime? UpdatedAt { get; set; }
     public ICollection<AnswerComment> Comments { get; set; } = [];
     public ICollection<AnswerLike> AnswerLikes { get; set; } = [];
+    public ICollection<AnswerComplaint> Complaints { get; set; } = [];
 }

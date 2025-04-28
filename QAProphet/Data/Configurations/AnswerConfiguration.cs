@@ -12,24 +12,34 @@ public class AnswerConfiguration : IEntityTypeConfiguration<Answer>
 
         builder.HasQueryFilter(answer => !answer.IsDeleted);
 
-        builder.Property(answer => answer.AuthorName)
+        builder
+            .Property(answer => answer.AuthorName)
             .IsRequired()
             .HasMaxLength(96);
 
-        builder.Property(answer => answer.Content)
+        builder
+            .Property(answer => answer.Content)
             .IsRequired()
             .HasMaxLength(-1);
 
-        builder.HasOne(answer => answer.Question)
+        builder
+            .HasOne(answer => answer.Question)
             .WithMany(question => question.Answers)
             .HasForeignKey(answer => answer.QuestionId);
 
-        builder.HasMany(answer => answer.Comments)
+        builder
+            .HasMany(answer => answer.Comments)
             .WithOne(answerComment => answerComment.Answer)
             .HasForeignKey(answerComment => answerComment.AnswerId);
         
-        builder.HasMany(answer => answer.AnswerLikes)
+        builder
+            .HasMany(answer => answer.AnswerLikes)
             .WithOne(answerLike => answerLike.Answer)
             .HasForeignKey(answerLike => answerLike.AnswerId);
+        
+        builder
+            .HasMany(answer => answer.Complaints)
+            .WithOne(complaint => complaint.Answer)
+            .HasForeignKey(complaint => complaint.AnswerId);
     }
 }

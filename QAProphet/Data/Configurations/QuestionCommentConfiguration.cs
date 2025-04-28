@@ -12,15 +12,18 @@ public class QuestionCommentConfiguration : IEntityTypeConfiguration<QuestionCom
         
         builder.HasKey(questionComment => questionComment.Id);
         
-        builder.Property(questionComment => questionComment.AuthorName)
+        builder
+            .Property(questionComment => questionComment.AuthorName)
             .IsRequired()
             .HasMaxLength(96);
 
-        builder.Property(questionComment => questionComment.Content)
+        builder
+            .Property(questionComment => questionComment.Content)
             .IsRequired()
             .HasMaxLength(-1);
 
-        builder.HasOne(questionComment => questionComment.Question)
+        builder
+            .HasOne(questionComment => questionComment.Question)
             .WithMany(question => question.Comments)
             .HasForeignKey(questionComment => questionComment.QuestionId);
     }
