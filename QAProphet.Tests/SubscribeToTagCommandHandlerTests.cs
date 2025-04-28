@@ -63,7 +63,8 @@ public sealed class SubscribeToTagCommandHandlerTests : IDisposable
         var handler = new SubscribeToTagHandler(dbContext);
 
         await handler.Handle(command, TestContext.Current.CancellationToken);
-
+        
+        Assert.True(dbContext.TagSubscribes.Any());
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
 
