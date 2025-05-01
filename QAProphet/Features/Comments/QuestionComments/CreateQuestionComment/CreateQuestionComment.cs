@@ -68,10 +68,12 @@ internal sealed class
     CreateQuestionCommentHandler : IRequestHandler<CreateQuestionCommentCommand, ErrorOr<CommentResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public CreateQuestionCommentHandler(AppDbContext dbContext)
+    public CreateQuestionCommentHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
 
     public async Task<ErrorOr<CommentResponse>> Handle(CreateQuestionCommentCommand request,
@@ -90,7 +92,7 @@ internal sealed class
             AuthorId = request.AuthorId,
             AuthorName = request.AuthorName,
             Content = request.Content,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             QuestionId = request.QuestionId,
             IsDeleted = false
         };

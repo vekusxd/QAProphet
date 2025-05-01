@@ -74,10 +74,12 @@ internal sealed record PostAnswerCommand(
 internal sealed record PostAnswerHandler : IRequestHandler<PostAnswerCommand, ErrorOr<PostAnswerResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public PostAnswerHandler(AppDbContext dbContext)
+    public PostAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
 
     public async Task<ErrorOr<PostAnswerResponse>> Handle(
@@ -97,7 +99,7 @@ internal sealed record PostAnswerHandler : IRequestHandler<PostAnswerCommand, Er
             AuthorId = request.AuthorId,
             AuthorName = request.AuthorName,
             Content = request.Content,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             QuestionId = request.QuestionId,
             Likes = 0,
             IsBest = false

@@ -70,10 +70,12 @@ internal sealed record EditAnswerCommand(
 internal sealed class EditAnswerHandler : IRequestHandler<EditAnswerCommand, ErrorOr<AnswerUpdateResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public EditAnswerHandler(AppDbContext dbContext)
+    public EditAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
     
     public async Task<ErrorOr<AnswerUpdateResponse>> Handle(EditAnswerCommand request, CancellationToken cancellationToken)
@@ -91,13 +93,15 @@ internal sealed class EditAnswerHandler : IRequestHandler<EditAnswerCommand, Err
            return Error.Forbidden("Not author", "Not author");
        }
        
-       if (DateTime.UtcNow - answer.CreatedAt > TimeSpan.FromHours(1))
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
+       
+       if (currentTime - answer.CreatedAt > TimeSpan.FromHours(1))
        {
            return Error.Conflict("Time expired", "time for update expired");
        }
        
        answer.Content = request.Content;
-       answer.UpdatedAt = DateTime.UtcNow;
+       answer.UpdatedAt = currentTime;
        
        _dbContext.Answers.Update(answer);
        await _dbContext.SaveChangesAsync(cancellationToken);

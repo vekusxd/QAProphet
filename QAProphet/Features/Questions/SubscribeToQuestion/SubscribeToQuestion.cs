@@ -13,7 +13,13 @@ public class SubscribeToQuestion : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/api/questions/subscribe/{questionId:guid}", Handle);
+        app.MapPut("/api/questions/subscribe/{questionId:guid}", Handle)
+            .WithTags(nameof(Question))
+            .RequireAuthorization()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
     }
 
     private static async Task<IResult> Handle(

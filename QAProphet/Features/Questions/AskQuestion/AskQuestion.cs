@@ -78,10 +78,12 @@ internal sealed record AskQuestionCommand(
 internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, ErrorOr<AskQuestionResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public AskQuestionHandler(AppDbContext dbContext)
+    public AskQuestionHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
     
     public async Task<ErrorOr<AskQuestionResponse>> Handle(
@@ -102,7 +104,7 @@ internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, E
         var question = new Question
         {
             Title = request.Title,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             Content = request.Description,
             AuthorName = request.AuthorName,
             QuestionerId = Guid.Parse(request.AuthorId)

@@ -18,8 +18,8 @@ public class SubscribeToTag : ICarterModule
             .WithTags(nameof(Tag))
             .RequireAuthorization()
             .ProducesValidationProblem()
-            .Produces(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden);
     }

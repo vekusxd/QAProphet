@@ -1,4 +1,5 @@
 using ErrorOr;
+using Microsoft.Extensions.Time.Testing;
 using QAProphet.Features.Questions.AskQuestion;
 
 namespace QAProphet.Tests;
@@ -25,7 +26,9 @@ public sealed class AskQuestionCommandHandlerTests : IDisposable
 
         await using var dbContext = _dbContextWrapper.DbContext;
         
-        var handler = new AskQuestionHandler(dbContext);
+        var timeProvider = new FakeTimeProvider();
+        
+        var handler = new AskQuestionHandler(dbContext, timeProvider);
         
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -40,6 +43,7 @@ public sealed class AskQuestionCommandHandlerTests : IDisposable
     {
         //arrange
         await using var dbContext = _dbContextWrapper.DbContext;
+        var timeProvider = new FakeTimeProvider();
         
         var command = new AskQuestionCommand(
             "Question title",
@@ -48,7 +52,7 @@ public sealed class AskQuestionCommandHandlerTests : IDisposable
             "User", 
             [_dbContextWrapper.TagIds.First(), _dbContextWrapper.TagIds.Last()]);
         
-        var handler = new AskQuestionHandler(dbContext);
+        var handler = new AskQuestionHandler(dbContext, timeProvider);
         
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);

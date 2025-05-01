@@ -68,10 +68,12 @@ internal sealed class
     UpdateQuestionCommentHandler : IRequestHandler<UpdateQuestionCommentCommand, ErrorOr<CommentResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public UpdateQuestionCommentHandler(AppDbContext dbContext)
+    public UpdateQuestionCommentHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
 
     public async Task<ErrorOr<CommentResponse>> Handle(UpdateQuestionCommentCommand request,
@@ -90,12 +92,14 @@ internal sealed class
             return Error.Forbidden("Not author", "Not author");
         }
 
-        if (DateTime.UtcNow - comment.CreatedAt > TimeSpan.FromHours(1))
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
+
+        if (currentTime - comment.CreatedAt > TimeSpan.FromHours(1))
         {
             return Error.Conflict("TimeExpirer", "Time for update expired");
         }
 
-        comment.UpdateTime = DateTime.UtcNow;
+        comment.UpdateTime = currentTime;
         comment.Content = request.Content;
         _dbContext.QuestionComments.Update(comment);
         await _dbContext.SaveChangesAsync(cancellationToken);

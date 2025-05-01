@@ -53,10 +53,12 @@ internal sealed record DeleteAnswerCommand(
 internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand, ErrorOr<bool>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public DeleteAnswerHandler(AppDbContext dbContext)
+    public DeleteAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
     
     public async Task<ErrorOr<bool>> Handle(DeleteAnswerCommand request, CancellationToken cancellationToken)
@@ -73,8 +75,10 @@ internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand,
         {
             return Error.Forbidden("NotAuthor", "Not author");
         }
+        
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
 
-        if (DateTime.UtcNow - answer.CreatedAt > TimeSpan.FromHours(1))
+        if (currentTime - answer.CreatedAt > TimeSpan.FromHours(1))
         {
             return Error.Conflict("TimeExpired", "time for delete expired");
         }

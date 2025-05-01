@@ -50,10 +50,12 @@ internal sealed record LikeAnswerCommand(Guid AnswerId, Guid UserId)
 internal sealed class LikeAnswerHandler : IRequestHandler<LikeAnswerCommand, ErrorOr<AnswerUpdateResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public LikeAnswerHandler(AppDbContext dbContext)
+    public LikeAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
 
     public async Task<ErrorOr<AnswerUpdateResponse>> Handle(LikeAnswerCommand request, CancellationToken cancellationToken)
@@ -80,7 +82,7 @@ internal sealed class LikeAnswerHandler : IRequestHandler<LikeAnswerCommand, Err
             {
                 AnswerId = answer.Id,
                 AuthorId = request.UserId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
                 IsDeleted = false
             };
             await _dbContext.AnswerLikes.AddAsync(answerLike, cancellationToken);

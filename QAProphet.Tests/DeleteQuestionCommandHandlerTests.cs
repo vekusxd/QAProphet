@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using Microsoft.Extensions.Time.Testing;
 using QAProphet.Domain;
 using QAProphet.Features.Questions.DeleteQuestion;
 
@@ -20,8 +21,9 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var command = new DeleteQuestionCommand(Guid.NewGuid(), Guid.NewGuid());
 
         await using var dbContext = _dbContextWrapper.DbContext;
+        var timeProvider = new FakeTimeProvider();
 
-        var handler = new DeleteQuestionHandler(dbContext);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -39,6 +41,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var questionId = Guid.NewGuid();
 
         await using var dbContext = _dbContextWrapper.DbContext;
+        var timeProvider = new FakeTimeProvider();
 
         var question = new Question
         {
@@ -47,14 +50,14 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
             QuestionerId = authorId,
             Title = "Title",
             Content = "Content",
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = timeProvider.GetUtcNow().UtcDateTime,
         };
 
         dbContext.Questions.Add(question);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var command = new DeleteQuestionCommand(questionId, Guid.NewGuid());
-        var handler = new DeleteQuestionHandler(dbContext);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -72,7 +75,8 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var questionId = Guid.NewGuid();
 
         await using var dbContext = _dbContextWrapper.DbContext;
-
+        var timeProvider = new FakeTimeProvider();
+        
         var question = new Question
         {
             Id = questionId,
@@ -80,14 +84,16 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
             QuestionerId = authorId,
             Title = "Title",
             Content = "Content",
-            CreatedAt = DateTime.UtcNow - TimeSpan.FromHours(2),
+            CreatedAt = timeProvider.GetUtcNow().UtcDateTime,
         };
+        
+        timeProvider.SetUtcNow(timeProvider.GetUtcNow() + TimeSpan.FromHours(3));
 
         dbContext.Questions.Add(question);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var command = new DeleteQuestionCommand(questionId, authorId);
-        var handler = new DeleteQuestionHandler(dbContext);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -105,6 +111,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var questionId = Guid.NewGuid();
 
         await using var dbContext = _dbContextWrapper.DbContext;
+        var timeProvider = new FakeTimeProvider();
 
         var question = new Question
         {
@@ -113,14 +120,14 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
             QuestionerId = authorId,
             Title = "Title",
             Content = "Content",
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = timeProvider.GetUtcNow().UtcDateTime,
         };
 
         dbContext.Questions.Add(question);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var command = new DeleteQuestionCommand(questionId, authorId);
-        var handler = new DeleteQuestionHandler(dbContext);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);

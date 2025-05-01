@@ -67,10 +67,12 @@ internal sealed record EditQuestionCommand(
 internal sealed class EditQuestionHandler : IRequestHandler<EditQuestionCommand, ErrorOr<bool>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public EditQuestionHandler(AppDbContext dbContext)
+    public EditQuestionHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
     
     public async Task<ErrorOr<bool>> Handle(EditQuestionCommand request, CancellationToken cancellationToken)
@@ -88,7 +90,9 @@ internal sealed class EditQuestionHandler : IRequestHandler<EditQuestionCommand,
             return Error.Forbidden("NotAuthor", "Not Author");
         }
         
-        if (DateTime.UtcNow - question.CreatedAt > TimeSpan.FromHours(1))
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
+        
+        if (currentTime - question.CreatedAt > TimeSpan.FromHours(1))
         {
             return Error.Conflict("Time expired", "time for update expired");
         }
@@ -105,7 +109,7 @@ internal sealed class EditQuestionHandler : IRequestHandler<EditQuestionCommand,
         
         question.Title = request.Title;
         question.Content = request.Content;
-        question.UpdateTime = DateTime.UtcNow;
+        question.UpdateTime = currentTime;
         
         var questionTags = tags
             .Select(t => new QuestionTags{QuestionId = request.QuestionId, TagId = t.Id})

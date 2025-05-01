@@ -67,10 +67,12 @@ internal sealed record CreateAnswerCommentCommand(
 internal sealed class CreateAnswerCommentHandler : IRequestHandler<CreateAnswerCommentCommand, ErrorOr<CommentResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly TimeProvider _timeProvider;
 
-    public CreateAnswerCommentHandler(AppDbContext dbContext)
+    public CreateAnswerCommentHandler(AppDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
 
     public async Task<ErrorOr<CommentResponse>> Handle(CreateAnswerCommentCommand request,
@@ -88,7 +90,7 @@ internal sealed class CreateAnswerCommentHandler : IRequestHandler<CreateAnswerC
             AuthorId = request.AuthorId,
             AuthorName = request.AuthorName,
             Content = request.Content,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             AnswerId = request.AnswerId,
             IsDeleted = false
         };
