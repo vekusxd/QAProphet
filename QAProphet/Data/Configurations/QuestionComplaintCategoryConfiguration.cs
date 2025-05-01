@@ -4,22 +4,22 @@ using QAProphet.Domain;
 
 namespace QAProphet.Data.Configurations;
 
-public class QuestionComplaintConfiguration : IEntityTypeConfiguration<QuestionComplaint>
+public class QuestionComplaintCategoryConfiguration : IEntityTypeConfiguration<QuestionComplaintCategory>
 {
-    public void Configure(EntityTypeBuilder<QuestionComplaint> builder)
+    public void Configure(EntityTypeBuilder<QuestionComplaintCategory> builder)
     {
         builder.HasKey(qc => qc.Id);
         
         builder.HasQueryFilter(answerComment => !answerComment.IsDeleted);
-
-        builder
-            .HasOne(qc => qc.Question)
-            .WithMany(q => q.Complaints)
-            .HasForeignKey(qc => qc.QuestionId);
         
         builder
-            .HasOne(qc => qc.Category)
-            .WithMany(c => c.Complaints)
+            .Property(qc => qc.Title)
+            .HasMaxLength(96)
+            .IsRequired();
+        
+        builder
+            .HasMany(qc => qc.Complaints)
+            .WithOne(c => c.Category)
             .HasForeignKey(qc => qc.CategoryId);
     }
 }

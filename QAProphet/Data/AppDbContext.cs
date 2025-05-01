@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<QuestionSubscribe> QuestionSubscribes { get; set; }
     public DbSet<QuestionComplaint> QuestionComplaints { get; set; }
     public DbSet<AnswerComplaint> AnswerComplaints { get; set; }
+    public DbSet<QuestionComplaintCategory> QuestionComplaintCategories { get; set; }
+    public DbSet<AnswerComplaintCategory> AnswerComplaintCategories { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

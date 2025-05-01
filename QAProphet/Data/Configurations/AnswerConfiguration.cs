@@ -43,3 +43,4 @@ public class AnswerConfiguration : IEntityTypeConfiguration<Answer>
             .HasForeignKey(complaint => complaint.AnswerId);
     }
 }
+

@@ -97,4 +97,71 @@ public class Seed
         _dbContext.Tags.AddRange(tags);
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task SeedComplaintCategories()
+    {
+        List<QuestionComplaintCategory> questionComplaintCategories = 
+        [
+            new()
+            {
+                Title = "Это вообще не вопрос"
+            },
+            new()
+            {
+                Title = "Вопрос содержит оскорбления"
+            },
+            new()
+            {
+                Title = "Вопрос нарушает правила сообщества"
+            },
+            new()
+            {
+                Title = "Вопрос содержит спам или рекламу"
+            },
+            new()
+            {
+                Title = "Вопрос не по теме"
+            },
+            new()
+            {
+                Title = "Другое"
+            }
+        ];
+
+        List<AnswerComplaintCategory> answerComplaintCategories = 
+        [
+            new()
+            {
+                Title = "Это вообще не ответ"
+            },
+            new()
+            {
+                Title = "Ответ содержит оскорбления"
+            },
+            new()
+            {
+                Title = "Ответ не соответствует вопросу"
+            },
+            new()
+            {
+                Title = "Ответ содержит спам или рекламу"
+            },
+            new()
+            {
+                Title = "Ответ нарушает правила сообщества"
+            },
+            new()
+            {
+                Title = "Другое"
+            }
+        ];
+        
+        if (!_dbContext.QuestionComplaintCategories.Any()) 
+            _dbContext.QuestionComplaintCategories.AddRange(questionComplaintCategories);
+        
+        if (!_dbContext.AnswerComplaintCategories.Any())
+            _dbContext.AnswerComplaintCategories.AddRange(answerComplaintCategories);
+        
+        await _dbContext.SaveChangesAsync();
+    }
 }

@@ -65,6 +65,7 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<Seed>();
     await seeder.SeedTags();
+    await seeder.SeedComplaintCategories();
 }
 
 app.UseHttpsRedirection();
