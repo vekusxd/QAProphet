@@ -3,9 +3,11 @@ using Carter;
 using ErrorOr;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
+using QAProphet.Options;
 
 namespace QAProphet.Features.Comments.QuestionComments.DeleteQuestionComment;
 
@@ -53,11 +55,13 @@ internal sealed class DeleteQuestionCommentHandler : IRequestHandler<DeleteQuest
 {
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly IOptions<QuestionTimeoutOptions> _options;
 
-    public DeleteQuestionCommentHandler(AppDbContext dbContext, TimeProvider timeProvider)
+    public DeleteQuestionCommentHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<QuestionTimeoutOptions> options)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
+        _options = options;
     }
 
     public async Task<ErrorOr<bool>> Handle(DeleteQuestionCommentCommand request, CancellationToken cancellationToken)
@@ -75,7 +79,7 @@ internal sealed class DeleteQuestionCommentHandler : IRequestHandler<DeleteQuest
             return Error.Forbidden("NotAuthor", "Not Author");
         }
 
-        if (_timeProvider.GetUtcNow().UtcDateTime - comment.CreatedAt > TimeSpan.FromHours(1))
+        if (_timeProvider.GetUtcNow().UtcDateTime - comment.CreatedAt > TimeSpan.FromMinutes(_options.Value.DeleteCommentInMinutes))
         {
             return Error.Conflict("Time expired", "Time for delete expired");
         }

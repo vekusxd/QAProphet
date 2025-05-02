@@ -4,11 +4,13 @@ using ErrorOr;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Answers.Shared.Mapping;
 using QAProphet.Features.Answers.Shared.Responses;
+using QAProphet.Options;
 
 namespace QAProphet.Features.Answers.EditAnswer;
 
@@ -71,11 +73,13 @@ internal sealed class EditAnswerHandler : IRequestHandler<EditAnswerCommand, Err
 {
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly IOptions<AnswerTimeoutOptions> _options;
 
-    public EditAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider)
+    public EditAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<AnswerTimeoutOptions> options)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
+        _options = options;
     }
     
     public async Task<ErrorOr<AnswerUpdateResponse>> Handle(EditAnswerCommand request, CancellationToken cancellationToken)
@@ -95,7 +99,7 @@ internal sealed class EditAnswerHandler : IRequestHandler<EditAnswerCommand, Err
        
         var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
        
-       if (currentTime - answer.CreatedAt > TimeSpan.FromHours(1))
+       if (currentTime - answer.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditAnswerInMinutes))
        {
            return Error.Conflict("Time expired", "time for update expired");
        }

@@ -3,13 +3,16 @@ using Carter;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using QAProphet.Data;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Comments.Shared.Requests;
 using QAProphet.Features.Shared.Mappings;
 using QAProphet.Features.Shared.Responses;
+using QAProphet.Options;
 
 namespace QAProphet.Features.Comments.AnswerComments.UpdateAnswerComment;
 
@@ -68,11 +71,13 @@ internal sealed class UpdateAnswerCommentHandler : IRequestHandler<UpdateAnswerC
 {
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly IOptions<AnswerTimeoutOptions> _options;
 
-    public UpdateAnswerCommentHandler(AppDbContext dbContext, TimeProvider timeProvider)
+    public UpdateAnswerCommentHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<AnswerTimeoutOptions> options)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
+        _options = options;
     }
 
     public async Task<ErrorOr<CommentResponse>> Handle(UpdateAnswerCommentCommand request,
@@ -93,7 +98,7 @@ internal sealed class UpdateAnswerCommentHandler : IRequestHandler<UpdateAnswerC
         
         var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
 
-        if (currentTime - comment.CreatedAt > TimeSpan.FromHours(1))
+        if (currentTime - comment.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditCommentInMinutes))
         {
             return Error.Conflict("TimeExpirer", "Time for update expired");
         }

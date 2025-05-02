@@ -1,17 +1,24 @@
 ﻿using ErrorOr;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using QAProphet.Domain;
 using QAProphet.Features.Questions.DeleteQuestion;
+using QAProphet.Options;
 
 namespace QAProphet.Tests;
 
 public sealed class DeleteQuestionCommandHandlerTests : IDisposable
 {
     private readonly DbContextWrapper _dbContextWrapper;
+    private readonly IOptions<QuestionTimeoutOptions> _options;
 
     public DeleteQuestionCommandHandlerTests()
     {
         _dbContextWrapper = new DbContextWrapper();
+        _options = Microsoft.Extensions.Options.Options.Create(new QuestionTimeoutOptions
+        {
+            DeleteQuestionInMinutes = 60
+        });
     }
 
     [Fact]
@@ -23,7 +30,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         await using var dbContext = _dbContextWrapper.DbContext;
         var timeProvider = new FakeTimeProvider();
 
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -57,7 +64,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var command = new DeleteQuestionCommand(questionId, Guid.NewGuid());
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -93,7 +100,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var command = new DeleteQuestionCommand(questionId, authorId);
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -127,7 +134,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var command = new DeleteQuestionCommand(questionId, authorId);
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);

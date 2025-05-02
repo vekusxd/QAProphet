@@ -1,7 +1,6 @@
 using Carter;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using QAProphet;
 using QAProphet.Data;
 using QAProphet.Extensions;
 using QAProphet.Hubs;
@@ -16,6 +15,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        ?? throw new Exception("Connection string was not found");
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
+
+builder.Services.Configure<AnswerTimeoutOptions>(builder.Configuration.GetRequiredSection(AnswerTimeoutOptions.Section));
+builder.Services.Configure<QuestionTimeoutOptions>(builder.Configuration.GetRequiredSection(QuestionTimeoutOptions.Section));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi(options =>
