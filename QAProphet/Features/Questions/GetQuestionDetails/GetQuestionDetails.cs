@@ -65,12 +65,13 @@ internal sealed class GetQuestionDetailsHandler : IRequestHandler<GetQuestionDet
     public async Task<ErrorOr<QuestionDetailsResponse>> Handle(GetQuestionDetailsQuery request, CancellationToken cancellationToken)
     {
         var question = await _dbContext.Questions
-            .AsNoTracking()
             .Include(q => q.Answers)
             .ThenInclude(a => a.Comments)
             .Include(q => q.Comments)
             .Include(q => q.Tags)
             .ThenInclude(t => t.Tag)
+            .AsSplitQuery()
+            .AsNoTracking()
             .FirstOrDefaultAsync(q => q.Id == request.QuestionId, cancellationToken);
 
         if (question is null)
