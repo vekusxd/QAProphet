@@ -38,7 +38,9 @@ public class PostAnswerComplaint : ICarterModule
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
+        {
             return Results.ValidationProblem(validationResult.ToDictionary());
+        }
 
         var userId = claimsPrincipal.GetUserId();
 
@@ -106,6 +108,7 @@ internal sealed class PostAnswerComplaintHandler : IRequestHandler<PostAnswerCom
 
         await _dbContext.AnswerComplaints.AddAsync(complaint, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
         return null;
     }
 }

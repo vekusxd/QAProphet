@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using QAProphet.Extensions;
 
-namespace QAProphet.Features.Answers.PostAnswerComplaint;
+namespace QAProphet.Features.Questions.PostQuestionComplaint;
 
-public class PostAnswerComplaintRequestValidator : AbstractValidator<PostAnswerComplaintRequest>
+public class PostQuestionComplaintRequestValidator : AbstractValidator<PostQuestionComplaintRequest>
 {
-    public PostAnswerComplaintRequestValidator()
+    public PostQuestionComplaintRequestValidator()
     {
         RuleFor(p => p.ComplaintCategoryId)
             .NotEmpty()
@@ -15,7 +15,7 @@ public class PostAnswerComplaintRequestValidator : AbstractValidator<PostAnswerC
             .Must(s => s.IsGuid())
             .WithMessage("Категория должна быть в виде UUID");
 
-        RuleFor(p => p.AnswerId)
+        RuleFor(p => p.QuestionId)
             .NotEmpty()
             .WithMessage("Ответ обязателен обязателен")
             .NotNull()
