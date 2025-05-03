@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+body.kcBodyClass {
+   background: #202020;
+   position: relative;
+   height: inherit;
+}
+
+.kcButtonClass {
+   border-radius: 10px;
+   padding: 10px 0;
+   color: #E4E4E4;
+   font-family: "Inter";
+   font-size: 18px;
+   transition: all .25s;
+   font-weight: 500;
+}
+
+.pf-c-button.pf-m-primary {
+   background-color: #702DFF;
+
+}
+.pf-c-button.pf-m-primary:hover {
+   background-color: #a379ff;
+}
+.kcFormCardClass{
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translateY(-50%) translateX(-50%);
+   background-color: transparent;
+   border: none;
+   padding: 0;
+   width: 60%;
+}
+
+.kcInputGroup  {
+   background: none;
+}
+.login-pf-page.card-pf {
+   padding: 0;
+}
+.kcLoginClass {
+   width: 40%;
+   height: 100%;
+   padding: 0 96px;
+}
+
+/* .kcLoginClass::after{
+   content:'';
+   background: #702DFE;
+   position: absolute;
+   width: 50%;
+   height: calc(100% - 40px);
+   right: 15px;
+   top: 50%;
+   transform: translateY(-50%);
+   border-radius: 16px;
+} */
+#kc-info-wrapper {
+   background:none;
+}
+#kc-header-wrapper {
+   padding: 0;
+}
+.kcHeaderWrapperClass {
+   position: absolute;
+   top: 16px;
+   left: 32px;
+   font-family: "Inter";
+   color: white;
+   font-size: 24px;
+   font-weight: 600;
+   background: none;
+}
+
+.kcLocaleMainClass{
+   display: none;
+}
+
+.kcLabelClass{
+   color: white;
+}
+#kc-page-title {
+   width: fit-content;
+   text-align: left;
+   color: white;
+   font-family: "Inter";
+   font-size: 40px;
+   font-weight: 800;
+}
+
+.kcHtmlClass {
+   height: 100%;
+}
+
+.kcInputClass {
+   background: transparent;
+   color: #727272;
+   border-radius: 10px;
+   border:2px solid #e4e4e4;
+   padding:  5px;
+   font-size: 18px;
+   transition: all .25s;
+}
+
+.kcInputClass:focus,.kcInputClass:focus:hover {
+   outline: none;
+   border-color: #702DFF;
+}
+.kcInputClass:hover{
+   border-color: #a379ff;
+}
+
+.kcFormPasswordVisibilityButtonClass {
+   padding: 0;
+   border:none
+}
+.kcFormPasswordVisibilityButtonClass::after {
+   border:none
+}
+.kcFormPasswordVisibilityIconShow,  .kcFormPasswordVisibilityIconHide {
+   color: #e4e4e4;
+   position: absolute;
+   top: 50%;
+   transform: translateY(-50%);
+   right: 15px;
+   transition: all .25s;
+}
+.kcFormPasswordVisibilityIconShow:hover,  .kcFormPasswordVisibilityIconHide:hover {
+   color: #a379ff;
+}
+.pf-c-button.pf-m-control {
+   background: none;
+}
+.kcLabelClass, #kc-form-options {
+   font-family: "Inter";
+   font-size: 16px;
+   color: #fff;
+}
+#kc-form-options {
+   display: flex;
+   align-items: center;
+}
+#rememberMe {
+   top: 50%;
+   transform: translateY(-50%);
+   margin-top: 0;
+}
+
+a {
+   color: #E4E4E4;
+}
+
+.kcContentWrapperClass>* {
+   padding: 0;
+}
+.kcContentWrapperClass>.kcLabelWrapperClass>*>* {
+   font-family: "Inter";
+}
+#kc-content-wrapper{
+   margin-top: 10px;
+}
