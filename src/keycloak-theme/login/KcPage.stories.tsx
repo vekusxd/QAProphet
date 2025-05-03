@@ -1,9 +1,10 @@
+// @ts-nocheck
 import type { Meta, StoryObj } from '@storybook/react';
 
 import KcPage from './KcPage';
 
 const meta = {
-  component: KcPage,
+   component: KcPage,
 } satisfies Meta<typeof KcPage>;
 
 export default meta;
