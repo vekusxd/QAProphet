@@ -35,6 +35,8 @@ body.kcBodyClass {
 }
 
 .kcInputGroup  {
+   display: flex;
+   align-items: center;
    background: none;
 }
 .login-pf-page.card-pf {
@@ -93,9 +95,8 @@ body.kcBodyClass {
 .kcHtmlClass {
    height: 100%;
 }
-
 .kcInputClass {
-   background: transparent;
+   background-color: transparent;
    color: #727272;
    border-radius: 10px;
    border:2px solid #e4e4e4;
@@ -114,18 +115,21 @@ body.kcBodyClass {
 
 .kcFormPasswordVisibilityButtonClass {
    padding: 0;
-   border:none
+   width: 30px;
+   height: 30px;
+}
+.kcFormPasswordVisibilityButtonClass:hover > * {
+   color: #a379ff;
 }
 .kcFormPasswordVisibilityButtonClass::after {
    border:none
 }
 .kcFormPasswordVisibilityIconShow,  .kcFormPasswordVisibilityIconHide {
    color: #e4e4e4;
-   position: absolute;
-   top: 50%;
-   transform: translateY(-50%);
-   right: 15px;
    transition: all .25s;
+}
+#password,#password-confirm {
+   margin-right: 20px;
 }
 .kcFormPasswordVisibilityIconShow:hover,  .kcFormPasswordVisibilityIconHide:hover {
    color: #a379ff;

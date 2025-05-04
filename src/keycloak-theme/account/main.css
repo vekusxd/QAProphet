@@ -4,6 +4,9 @@ body.kcBodyClass {
    position: relative;
    height: inherit;
 }
+.navbar-title{
+   opacity: 0;
+}
 
 .bs-sidebar ul li a:hover, .bs-sidebar ul li a:focus {
    border-right: none;
@@ -27,7 +30,7 @@ body.kcBodyClass {
    padding: 0;
 }
 .kcButtonClass {
-   padding: 10px 15px;
+   padding: 5px 15px;
    border: none;
    border-radius: 10px;
    color: #E4E4E4;
