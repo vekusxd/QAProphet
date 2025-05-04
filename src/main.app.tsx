@@ -4,18 +4,19 @@ import {
    createBrowserRouter,
    RouterProvider,
 } from "react-router";
-import { Sosalishe } from "./pages/Sosalishe.tsx";
+import { Tags } from "./pages/Tags.tsx";
 const router = createBrowserRouter([
    {
       path: "/",
       element: <App />,
    }, {
-      path: "/sosalishe",
-      element: <Sosalishe />,
+      path: "/tags",
+      element: <Tags />,
    },
 ]);
 export default function AppEntrypoint() {
    return (
+
       <RouterProvider router={router} />
    )
 }
