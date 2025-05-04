@@ -20,6 +20,7 @@ body.kcBodyClass {
 
 }
 .pf-c-button.pf-m-primary:hover {
+   transform: scale(1.025);
    background-color: #a379ff;
 }
 .kcFormCardClass{

@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+body.kcBodyClass {
+   background: #202020;
+   position: relative;
+   height: inherit;
+}
+
+.bs-sidebar ul li a:hover, .bs-sidebar ul li a:focus {
+   border-right: none;
+}
+
+.content-area {
+   border: none;
+   background: #2c2c2c;
+}
+.control-label>* {
+   width: 100%;
+}
+.form-group{
+   display: flex;
+   align-items: center;
+}
+.form-group >*{
+   padding: 0 10px;
+}
+#kc-form-buttons{
+   padding: 0;
+}
+.kcButtonClass {
+   padding: 10px 15px;
+   border: none;
+   border-radius: 10px;
+   color: #E4E4E4;
+   font-family: "Inter";
+   font-size: 18px;
+   transition: all .25s;
+   font-weight: 500;
+   background-image: none;
+}
+
+.kcButtonDefaultClass {
+   background-color: #E4E4E4;
+}
+.kcButtonDefaultClass>span {
+   color: #202020;
+}
+.kcButtonDefaultClass:hover {
+   background-color: #f3f0f0;
+   transform: scale(1.025);
+}
+
+.kcButtonPrimaryClass  {
+   background-color: #702DFF;
+}
+.kcButtonPrimaryClass:hover {
+   background-color: #7c3fff;
+   transform: scale(1.025);
+}
+
+
+input.form-control {
+   color: #969696;
+   border: none;
+   border: 2px solid #e4e4e4;
+   padding:  15px 5px;
+   font-size: 18px;
+   transition: all .25s;
+   background: transparent;
+}
+input.form-control:hover{
+border-color:  #a379ff;
+
+
+}
+input.form-control:focus{
+   border-color: #702DFF;
+   outline: none;
+}
+.bs-sidebar {
+   padding-left: 10px;
+   padding-right: 10px;
+   background: #353535;
+}
+
+.bs-sidebar ul li a{
+   color: #727272;
+   border: none;
+   border-bottom: 2px solid #e4e4e4;
+   padding:  2px;
+   font-size: 18px;
+   transition: all .25s;
+   background: transparent;
+}
+
+.bs-sidebar ul li.active a{
+   width: 100%;
+   border-color: #702DFF;
+   background: none;
+}
+.bs-sidebar ul li.active a:hover{
+   border-bottom:2px solid #a379ff;
+}
+
+.bs-sidebar ul li a:hover{
+   border-right: none;
+   width: 100%;
+   border-color: #a379ff;
+}
+
+span {
+   color: #e4e4e4;
+}
+
