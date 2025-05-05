@@ -4,7 +4,7 @@ import {
    createBrowserRouter,
    RouterProvider,
 } from "react-router";
-import { Tags } from "./pages/Tags.tsx";
+import { Tags } from "./pages/Tags/Tags.tsx";
 const router = createBrowserRouter([
    {
       path: "/",

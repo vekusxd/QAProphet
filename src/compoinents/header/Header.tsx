@@ -36,10 +36,11 @@ export function Header() {
                Input: {
                   colorBorder: "#474747",
                   colorBgContainer: "transparent",
+
                   hoverBorderColor: "#915eff",
-                  colorTextDescription: '#474747',
                   colorPrimaryHover: '#915eff',
                   activeBorderColor: '#702DFF',
+                  colorTextDescription: '#474747',
                   colorText: '#e4e4e4'
                },
                Button: {
@@ -58,7 +59,7 @@ export function Header() {
       >
          <div className='flex w-full py-8 gap-x-10 items-center'>
             <Search
-               placeholder="input search text"
+               placeholder="Поиск"
                allowClear
                size="large"
                style={{ color: '#e4e4e4' }}
