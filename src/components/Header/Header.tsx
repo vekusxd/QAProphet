@@ -10,7 +10,7 @@ import { Link } from 'react-router';
 
 export function Header() {
 
-   const items: MenuProps['items'] = [
+   const items = [
       {
          key: '1',
          label: (

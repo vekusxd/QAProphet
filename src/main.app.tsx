@@ -1,5 +1,6 @@
 import App from "./App.tsx";
 import "./index.css";
+import { StyleProvider } from '@ant-design/cssinjs';
 import {
    createBrowserRouter,
    RouterProvider,
@@ -16,7 +17,8 @@ const router = createBrowserRouter([
 ]);
 export default function AppEntrypoint() {
    return (
-
-      <RouterProvider router={router} />
+      <StyleProvider layer >
+         <RouterProvider router={router} />
+      </StyleProvider>
    )
 }

@@ -1,13 +1,13 @@
 import { ConfigProvider, Dropdown, Layout } from "antd"
-import { Content, Footer, Header } from "antd/es/layout/layout"
+import { Content, Header } from "antd/es/layout/layout"
 import { DownOutlined } from '@ant-design/icons';
 import Sider from "antd/es/layout/Sider"
-import { Header as MyHeader } from "../../compoinents/header/Header"
+import { Header as MyHeader } from "../../components/Header/Header"
 import Search from 'antd/es/input/Search'
 import './tags.css'
-import { Link } from "react-router"
-import React, { useState } from "react"
-import { Tag } from "../../compoinents/Tag/Tag";
+import { useState } from "react"
+import { Tag } from "../../components/Tag/Tag";
+import Aside from "../../components/Aside/Aside";
 export const Tags = () => {
    const [filter, setFilter] = useState(1)
 
@@ -45,7 +45,7 @@ export const Tags = () => {
       },
    ]
 
-   const items: MenuProps['items'] = [
+   const items = [
       {
          key: '1',
          label: (
@@ -117,7 +117,9 @@ export const Tags = () => {
          }}
       >
          <Layout style={{ height: '100%', backgroundColor: "#202020" }}>
-            <Sider width="15%" style={{ background: '#202020', borderRight: '2px solid red' }}>Sider</Sider>
+            <Sider width="15%" style={{ background: '#202020', borderRight: '2px solid red' }}>
+               <Aside />
+            </Sider>
             <Layout style={{ background: '#202020' }}>
                <Header style={{ background: '#202020' }}>
                   <MyHeader />

@@ -1,5 +1,6 @@
-@import "tailwindcss";
+@layer theme, base, antd, components, utilities;
 
+@import 'tailwindcss';
 html,body,#root {
    height: 100%;
 }
