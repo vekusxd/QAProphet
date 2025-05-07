@@ -1,52 +1,58 @@
 ﻿services:
   qaprophet_api:
     image: qaprophet_api
-    container_name: qaprophet_api
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - qaprophet_db
+      - qaprophet_identity
     build:
       context: .
-      dockerfile: QAProphet.API/Dockerfile
-  
-  db:
-    container_name: qaprophet_db
+      dockerfile: QAProphet/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=qaprophet_db;Port=5432;Database=qaDb;User Id=postgres;Password=root;"
+      Keycloak__AuthorizationUrl: "http://localhost:18080/realms/qaProphet/protocol/openid-connect/auth"
+      Authentication__MetadataAddress: "http://localhost:18080/qaProphet/.well-known/openid-configuration"
+      Authentication__ValidIssuer: "http://localhost:18080/qaProphet"
+      Authentication__ValidAudience: "account"
+    
+  qaprophet_db:
     image: postgres
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./initSchema.sql:/docker-entrypoint-initdb.d/init_schema.sql
+      - ./KeycloakConfiguration/initSchema.sql:/docker-entrypoint-initdb.d/init_schema.sql
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: qaDb
 
-  keycloak:
+  qaprophet_identity:
     image: quay.io/keycloak/keycloak:latest
-    container_name: qaprophet_identity
     command: start-dev
     environment:
       - KC_HEALTH_ENABLED=true
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
       - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://db:5432/qaDb
+      - KC_DB_URL=jdbc:postgresql://qaprophet_db:5432/qaDb
       - KC_DB_SCHEMA=keycloak
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=root
       - KC_HOSTNAME=localhost
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
+      - KEYCLOAK_IMPORT= /opt/keycloak/imports/realm-export.json
     depends_on:
-      - db
+      - qaprophet_db
     volumes:
-      - keycloak-data:/opt/keycloak/data
+      - identity-data:/opt/keycloak/data
+      - ./KeycloakConfiguration/qaProphetTheme.jar:/opt/keycloak/providers/qaProphetTheme.jar
+      - ./KeycloakConfiguration/realm-export.json:/opt/keycloak/imports/realm-export.json
     ports:
       - "18080:8080"
 
 volumes:
   db_data:
-  keycloak-data:
-    
+  identity-data:

@@ -16,8 +16,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
 
-builder.Services.Configure<AnswerTimeoutOptions>(builder.Configuration.GetRequiredSection(AnswerTimeoutOptions.Section));
-builder.Services.Configure<QuestionTimeoutOptions>(builder.Configuration.GetRequiredSection(QuestionTimeoutOptions.Section));
+builder.Services.Configure<AnswerTimeoutOptions>(
+    builder.Configuration.GetRequiredSection(AnswerTimeoutOptions.Section));
+builder.Services.Configure<QuestionTimeoutOptions>(
+    builder.Configuration.GetRequiredSection(QuestionTimeoutOptions.Section));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi(options =>
@@ -48,19 +50,23 @@ builder.Services.AddCors(opts =>
             .AllowCredentials()
             .SetIsOriginAllowed((_) => true)
             .AllowAnyHeader());
-    
+
     opts.AddDefaultPolicy(policy => policy
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowAnyOrigin());
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin());
 });
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.MapScalarApiReference();
+
+if (!app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await dbContext.Database.MigrateAsync();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -83,4 +89,3 @@ app.MapHub<TestHub>("/hubs/hub");
 app.MapCarter();
 
 app.Run();
-
