@@ -4,35 +4,28 @@ using QAProphet.Features.Questions.AskQuestion;
 
 namespace QAProphet.Tests;
 
-public sealed class AskQuestionCommandHandlerTests : IDisposable
+public sealed class AskQuestionCommandHandlerTests(DbConnectionFixture dbConnectionFixture) : IAsyncLifetime
 {
-    private readonly DbContextWrapper _dbContextWrapper;
-    
-    public AskQuestionCommandHandlerTests()
-    {
-        _dbContextWrapper = new DbContextWrapper();
-    }
-    
     [Fact]
     public async Task Handle_ReturnsValidationErrorResult_WhenTagNotFound()
     {
         //arrange   
         var command = new AskQuestionCommand(
             "Question title",
-            "Question description", 
+            "Question description",
             Guid.NewGuid().ToString(),
-            "User", 
+            "User",
             [Guid.NewGuid(), Guid.NewGuid()]);
 
-        await using var dbContext = _dbContextWrapper.DbContext;
-        
+        var dbContext = dbConnectionFixture.DbContext;
+
         var timeProvider = new FakeTimeProvider();
-        
+
         var handler = new AskQuestionHandler(dbContext, timeProvider);
-        
+
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
-        
+
         //assert
         Assert.True(result.IsError);
         Assert.Equal(ErrorType.Validation, result.FirstError.Type);
@@ -42,29 +35,30 @@ public sealed class AskQuestionCommandHandlerTests : IDisposable
     public async Task Handle_ReturnsAskQuestionResponse_WhenAllGood()
     {
         //arrange
-        await using var dbContext = _dbContextWrapper.DbContext;
+        var dbContext = dbConnectionFixture.DbContext;
         var timeProvider = new FakeTimeProvider();
-        
+
         var command = new AskQuestionCommand(
             "Question title",
-            "Question description", 
+            "Question description",
             Guid.NewGuid().ToString(),
-            "User", 
-            [_dbContextWrapper.TagIds.First(), _dbContextWrapper.TagIds.Last()]);
-        
+            "User",
+            [dbConnectionFixture.TagIds.First(), dbConnectionFixture.TagIds.Last()]);
+
         var handler = new AskQuestionHandler(dbContext, timeProvider);
-        
+
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
-        
+
         //assert
         Assert.False(result.IsError);
         Assert.Empty(result.ErrorsOrEmptyList);
         Assert.NotNull(result.Value);
     }
 
-    public void Dispose()
-    {
-        _dbContextWrapper.Dispose();
-    }
+    public async ValueTask DisposeAsync()
+        => await dbConnectionFixture.ResetAsync();
+
+    public async ValueTask InitializeAsync()
+        => await dbConnectionFixture.SeedAsync();
 }

@@ -15,7 +15,7 @@
       Authentication__MetadataAddress: "http://localhost:18080/qaProphet/.well-known/openid-configuration"
       Authentication__ValidIssuer: "http://localhost:18080/qaProphet"
       Authentication__ValidAudience: "account"
-    
+  
   qaprophet_db:
     image: postgres
     ports:
@@ -30,26 +30,25 @@
 
   qaprophet_identity:
     image: quay.io/keycloak/keycloak:latest
-    command: start-dev
+    command: [ "start-dev", "--import-realm" ]
     environment:
-      - KC_HEALTH_ENABLED=true
-      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
-      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://qaprophet_db:5432/qaDb
-      - KC_DB_SCHEMA=keycloak
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=root
-      - KC_HOSTNAME=localhost
-      - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
-      - KEYCLOAK_IMPORT= /opt/keycloak/imports/realm-export.json
+      KC_HEALTH_ENABLED: true
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: "jdbc:postgresql://qaprophet_db:5432/qaDb"
+      KC_DB_SCHEMA: keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
     depends_on:
       - qaprophet_db
     volumes:
       - identity-data:/opt/keycloak/data
       - ./KeycloakConfiguration/qaProphetTheme.jar:/opt/keycloak/providers/qaProphetTheme.jar
-      - ./KeycloakConfiguration/realm-export.json:/opt/keycloak/imports/realm-export.json
+      - ./KeycloakConfiguration/realm-export.json:/opt/keycloak/data/import/realm-export.json
     ports:
       - "18080:8080"
 

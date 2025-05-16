@@ -7,14 +7,14 @@ using QAProphet.Options;
 
 namespace QAProphet.Tests;
 
-public sealed class DeleteQuestionCommandHandlerTests : IDisposable
+public sealed class DeleteQuestionCommandHandlerTests : IAsyncLifetime
 {
-    private readonly DbContextWrapper _dbContextWrapper;
+    private readonly DbConnectionFixture _dbConnectionFixture;
     private readonly IOptions<QuestionTimeoutOptions> _options;
 
-    public DeleteQuestionCommandHandlerTests()
+    public DeleteQuestionCommandHandlerTests(DbConnectionFixture dbConnectionFixture)
     {
-        _dbContextWrapper = new DbContextWrapper();
+        _dbConnectionFixture = dbConnectionFixture;
         _options = Microsoft.Extensions.Options.Options.Create(new QuestionTimeoutOptions
         {
             DeleteQuestionInMinutes = 60
@@ -27,7 +27,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         //arrange
         var command = new DeleteQuestionCommand(Guid.NewGuid(), Guid.NewGuid());
 
-        await using var dbContext = _dbContextWrapper.DbContext;
+        var dbContext = _dbConnectionFixture.DbContext;
         var timeProvider = new FakeTimeProvider();
 
         var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
@@ -47,7 +47,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var authorId = Guid.NewGuid();
         var questionId = Guid.NewGuid();
 
-        await using var dbContext = _dbContextWrapper.DbContext;
+        var dbContext = _dbConnectionFixture.DbContext;
         var timeProvider = new FakeTimeProvider();
 
         var question = new Question
@@ -81,9 +81,9 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var authorId = Guid.NewGuid();
         var questionId = Guid.NewGuid();
 
-        await using var dbContext = _dbContextWrapper.DbContext;
+        var dbContext = _dbConnectionFixture.DbContext;
         var timeProvider = new FakeTimeProvider();
-        
+
         var question = new Question
         {
             Id = questionId,
@@ -93,7 +93,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
             Content = "Content",
             CreatedAt = timeProvider.GetUtcNow().UtcDateTime,
         };
-        
+
         timeProvider.SetUtcNow(timeProvider.GetUtcNow() + TimeSpan.FromHours(3));
 
         dbContext.Questions.Add(question);
@@ -117,7 +117,7 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         var authorId = Guid.NewGuid();
         var questionId = Guid.NewGuid();
 
-        await using var dbContext = _dbContextWrapper.DbContext;
+        var dbContext = _dbConnectionFixture.DbContext;
         var timeProvider = new FakeTimeProvider();
 
         var question = new Question
@@ -145,8 +145,10 @@ public sealed class DeleteQuestionCommandHandlerTests : IDisposable
         Assert.True(result.Value);
     }
 
-    public void Dispose()
-    {
-        _dbContextWrapper.Dispose();
-    }
+
+    public async ValueTask DisposeAsync() =>
+        await _dbConnectionFixture.ResetAsync();
+
+    public async ValueTask InitializeAsync()
+        => await _dbConnectionFixture.SeedAsync();
 }
