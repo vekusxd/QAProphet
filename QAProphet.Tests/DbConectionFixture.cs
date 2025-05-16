@@ -29,8 +29,6 @@ public class DbConnectionFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        Console.WriteLine("Init called");
-
         _container = new PostgreSqlBuilder()
             .WithImage("postgres:latest")
             .Build();
@@ -58,8 +56,6 @@ public class DbConnectionFixture : IAsyncLifetime
 
     public async Task SeedAsync()
     {
-        Console.WriteLine("Seed called");
-
         for (var i = 0; i < 5; i++)
         {
             var tag = new Tag
@@ -78,8 +74,6 @@ public class DbConnectionFixture : IAsyncLifetime
 
     public async Task ResetAsync()
     {
-        Console.WriteLine("Reset called");
-
         await using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
