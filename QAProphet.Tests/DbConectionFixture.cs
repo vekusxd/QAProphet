@@ -11,7 +11,7 @@ using Testcontainers.PostgreSql;
 
 namespace QAProphet.Tests;
 
-public class DbConnectionFixture : IAsyncLifetime
+public sealed class DbConnectionFixture : IAsyncLifetime
 {
     private PostgreSqlContainer _container = null!;
     private string _connectionString = null!;

@@ -1,11 +1,14 @@
 using Carter;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using QAProphet.Behaviors;
 using QAProphet.Data;
 using QAProphet.Extensions;
 using QAProphet.Hubs;
 using QAProphet.Options;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        ?? throw new Exception("Connection string was not found");
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
+
+builder.Services.AddSerilog((options) => options.ReadFrom.Configuration(builder.Configuration));
 
 builder.Services.Configure<AnswerTimeoutOptions>(
     builder.Configuration.GetRequiredSection(AnswerTimeoutOptions.Section));
@@ -39,6 +44,8 @@ builder.Services.Configure<KeycloakOptions>(builder.Configuration.GetRequiredSec
 builder.Services.AddAuth(builder.Configuration);
 
 builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
 
 builder.Services.AddScoped<Seed>();
 

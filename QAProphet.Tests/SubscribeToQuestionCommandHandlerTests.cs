@@ -69,6 +69,7 @@ public sealed class SubscribeToQuestionCommandHandlerTests(DbConnectionFixture d
             QuestionerId = authorId,
             Title = "Title"
         };
+        
 
         await dbContext.Questions.AddAsync(question, TestContext.Current.CancellationToken);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
