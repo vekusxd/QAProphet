@@ -15,7 +15,8 @@
       Authentication__MetadataAddress: "http://localhost:18080/qaProphet/.well-known/openid-configuration"
       Authentication__ValidIssuer: "http://localhost:18080/qaProphet"
       Authentication__ValidAudience: "account"
-  
+      ElasticOptions__Url: "http://elastic:9200"
+
   qaprophet_db:
     image: postgres
     ports:
@@ -30,7 +31,7 @@
 
   qaprophet_identity:
     image: quay.io/keycloak/keycloak:latest
-    command: [ "start-dev", "--import-realm" ]
+    command: ["start-dev", "--import-realm"]
     environment:
       KC_HEALTH_ENABLED: true
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
@@ -61,8 +62,7 @@
       - seq_data:/data
     environment:
       ACCEPT_EULA: Y
-  
-  
+
   elastic:
     image: elasticsearch:9.0.1
     ports:
