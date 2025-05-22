@@ -1,8 +1,7 @@
 ﻿using ErrorOr;
-using Microsoft.EntityFrameworkCore;
 using QAProphet.Features.Tags.SubscribeToTag;
 
-namespace QAProphet.Tests;
+namespace QAProphet.Tests.CommandHandlerTests;
 
 public sealed class SubscribeToTagCommandHandlerTests(DbConnectionFixture dbConnectionFixture) : IAsyncLifetime
 {

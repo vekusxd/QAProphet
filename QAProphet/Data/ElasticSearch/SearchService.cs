@@ -13,7 +13,7 @@ public class SearchService : ISearchService
         _logger = logger;
     }
 
-    public async Task<bool> IndexEntry(Guid id, string title, string? url, string type)
+    public async Task<bool> AddOrUpdateEntry(Guid id, string title, string? url, string type)
     {
         var indexEntry = new IndexEntry
         {
@@ -32,10 +32,17 @@ public class SearchService : ISearchService
 
         if (!upsertResult.IsValidResponse)
         {
-            _logger.LogError("Failed to upsert index entry with id: {@indexEntryId}, {@indexEntryTitle}, {@error}", id, title, upsertResult.ElasticsearchServerError);
+            _logger.LogError("Failed to upsert index entry with id: {@indexEntryId}, {@indexEntryTitle}, {@error}", id,
+                title, upsertResult.ElasticsearchServerError);
             return false;
         }
 
         return true;
+    }
+
+    //TODO
+    public async Task<IndexEntry> SearchEntries(string startsWith, int pageSize, int pageNumber)
+    {
+        throw new NotImplementedException();
     }
 }

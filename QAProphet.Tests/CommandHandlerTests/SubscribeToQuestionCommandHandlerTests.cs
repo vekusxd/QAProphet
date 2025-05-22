@@ -1,9 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using ErrorOr;
+﻿using ErrorOr;
 using QAProphet.Domain;
 using QAProphet.Features.Questions.SubscribeToQuestion;
 
-namespace QAProphet.Tests;
+namespace QAProphet.Tests.CommandHandlerTests;
 
 public sealed class SubscribeToQuestionCommandHandlerTests(DbConnectionFixture dbConnectionFixture) : IAsyncLifetime
 {

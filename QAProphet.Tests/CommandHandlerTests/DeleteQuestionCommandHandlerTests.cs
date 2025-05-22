@@ -5,7 +5,7 @@ using QAProphet.Domain;
 using QAProphet.Features.Questions.DeleteQuestion;
 using QAProphet.Options;
 
-namespace QAProphet.Tests;
+namespace QAProphet.Tests.CommandHandlerTests;
 
 public sealed class DeleteQuestionCommandHandlerTests : IAsyncLifetime
 {

@@ -2,5 +2,6 @@
 
 public interface ISearchService
 {
-    Task<bool> IndexEntry(Guid id, string title, string? url, string type);
+    Task<bool> AddOrUpdateEntry(Guid id, string title, string? url, string type);
+    Task<IndexEntry> SearchEntries(string startsWith, int pageSize, int pageNumber);
 }

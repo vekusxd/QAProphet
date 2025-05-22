@@ -1,13 +1,12 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
 using QAProphet.Data.ElasticSearch;
 using QAProphet.Features.Questions.AskQuestion;
 
-namespace QAProphet.Tests;
+namespace QAProphet.Tests.CommandHandlerTests;
 
 public sealed class AskQuestionCommandHandlerTests(DbConnectionFixture dbConnectionFixture) : IAsyncLifetime
 {
@@ -43,7 +42,7 @@ public sealed class AskQuestionCommandHandlerTests(DbConnectionFixture dbConnect
         var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<AskQuestionHandler>.Instance;
 
         var searchService = new Mock<ISearchService>();
-        searchService.Setup(s => s.IndexEntry(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+        searchService.Setup(s => s.AddOrUpdateEntry(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(true);
 
         var handler = new AskQuestionHandler(dbContext, timeProvider, searchService.Object, linkGenerator.Object,
@@ -85,7 +84,7 @@ public sealed class AskQuestionCommandHandlerTests(DbConnectionFixture dbConnect
             .Returns("/");
 
         var searchService = new Mock<ISearchService>();
-        searchService.Setup(s => s.IndexEntry(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+        searchService.Setup(s => s.AddOrUpdateEntry(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(true);
 
         var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<AskQuestionHandler>.Instance;

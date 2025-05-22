@@ -21,11 +21,13 @@ public class SearchTags : ICarterModule
     }
 
     private static async Task<Ok<List<TagResponse>>> Handle(
-        [FromQuery] string term,
+        [FromQuery] string? term,
+        [FromQuery] int? pageSize,
+        [FromQuery] int? pageNumber,
         IMediator mediator,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetTagsQuery(term);
+        var query = new GetTagsQuery(term ?? string.Empty, pageSize ?? 10, pageNumber ?? 1);
         var response = await mediator.Send(query, cancellationToken);
         
         return TypedResults.Ok(response);
@@ -33,7 +35,9 @@ public class SearchTags : ICarterModule
 }
 
 internal sealed record GetTagsQuery(
-    string Term) :
+    string Term,
+    int PageSize,
+    int PageNumber) :
     IRequest<List<TagResponse>>;
 
 internal sealed class GetTagsHandler : IRequestHandler<GetTagsQuery, List<TagResponse>>
@@ -47,11 +51,14 @@ internal sealed class GetTagsHandler : IRequestHandler<GetTagsQuery, List<TagRes
     
     public async Task<List<TagResponse>> Handle(GetTagsQuery request, CancellationToken cancellationToken)
     {
+        var offset = (request.PageNumber - 1) * request.PageSize;
+        
         var tags = await _db.Tags
             .AsNoTracking()
             .Where(t => t.Title.ToLower().StartsWith(request.Term.ToLower()))
             .OrderBy(t => t.Title)
-            .Take(10)
+            .Skip(offset)
+            .Take(request.PageSize)
             .Select(t =>t.MapToResponse())
             .ToListAsync(cancellationToken: cancellationToken);
 

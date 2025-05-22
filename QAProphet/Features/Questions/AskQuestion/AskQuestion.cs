@@ -140,11 +140,11 @@ internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, E
 
             var url = _linkGenerator.GetPathByName(path, new { id = question.Id });
 
-            await _searchService.IndexEntry(question.Id, question.Title, url, nameof(Question));
+            await _searchService.AddOrUpdateEntry(question.Id, question.Title, url, nameof(Question));
         }
         catch (ArgumentException ex)
         {
-            _logger.LogError(ex, "Error creating index entry");
+            _logger.LogError(ex, "Error indexing question with id {@questionId}", question.Id);
         }
 
         return question.MapToAskResponse();
