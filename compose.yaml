@@ -61,8 +61,21 @@
       - seq_data:/data
     environment:
       ACCEPT_EULA: Y
+  
+  
+  elastic:
+    image: elasticsearch:9.0.1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch_data:/data/elastic
 
 volumes:
   db_data:
   identity-data:
   seq_data:
+  elasticsearch_data:

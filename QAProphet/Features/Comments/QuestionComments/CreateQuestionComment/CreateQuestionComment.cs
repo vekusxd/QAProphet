@@ -5,6 +5,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Comments.Shared.Requests;
@@ -58,7 +59,7 @@ public class CreateQuestionComment : ICarterModule
 }
 
 internal sealed record CreateQuestionCommentCommand(
-    Guid AuthorId,
+    Guid UserId,
     Guid QuestionId,
     string AuthorName,
     string Content)
@@ -89,7 +90,7 @@ internal sealed class
 
         var comment = new QuestionComment
         {
-            AuthorId = request.AuthorId,
+            AuthorId = request.UserId,
             AuthorName = request.AuthorName,
             Content = request.Content,
             CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,

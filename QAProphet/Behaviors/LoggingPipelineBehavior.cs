@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ErrorOr;
+using MediatR;
 
 namespace QAProphet.Behaviors;
 
@@ -16,6 +17,7 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
         CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
+
 
         _logger.LogInformation("Start handling request {RequestName}, {DateTimeUtc}",
             requestName,

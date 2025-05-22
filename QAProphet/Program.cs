@@ -1,9 +1,10 @@
 using Carter;
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Behaviors;
-using QAProphet.Data;
+using QAProphet.Data.ElasticSearch;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Extensions;
 using QAProphet.Hubs;
 using QAProphet.Options;
@@ -43,11 +44,23 @@ builder.Services.Configure<KeycloakOptions>(builder.Configuration.GetRequiredSec
 
 builder.Services.AddAuth(builder.Configuration);
 
-builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(configuration =>
+{
+    configuration.RegisterServicesFromAssembly(typeof(Program).Assembly);
 
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
+    configuration.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+});
+
+var elasticOptions = builder.Configuration.GetRequiredSection(ElasticOptions.Section).Get<ElasticOptions>() ??
+                     throw new Exception($"Missing {ElasticOptions.Section}");
+
+var settings = new ElasticsearchClientSettings(new Uri(elasticOptions.Url));
+var client = new ElasticsearchClient(settings);
+
+builder.Services.AddSingleton(client);
 
 builder.Services.AddScoped<Seed>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 
 builder.Services.AddCors(opts =>
 {

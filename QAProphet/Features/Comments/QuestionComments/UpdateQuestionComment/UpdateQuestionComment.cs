@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Comments.Shared.Requests;
@@ -44,24 +45,24 @@ public class UpdateQuestionComment : ICarterModule
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-        
+
         var userId = claimsPrincipal.GetUserId();
-        
+
         var command = new UpdateQuestionCommentCommand(Guid.Parse(userId!), commentId, request.Content);
-        
+
         var result = await mediator.Send(command, cancellationToken);
 
         if (result.IsError)
         {
             return result.Errors.ToProblem();
         }
-        
+
         return Results.NoContent();
     }
 }
 
 internal sealed record UpdateQuestionCommentCommand(
-    Guid AuthorId,
+    Guid UserId,
     Guid CommentId,
     string Content)
     : IRequest<ErrorOr<CommentResponse>>;
@@ -72,12 +73,18 @@ internal sealed class
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<QuestionTimeoutOptions> _options;
+    private readonly ILogger<UpdateQuestionCommentHandler> _logger;
 
-    public UpdateQuestionCommentHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<QuestionTimeoutOptions> options)
+    public UpdateQuestionCommentHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<QuestionTimeoutOptions> options,
+        ILogger<UpdateQuestionCommentHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<CommentResponse>> Handle(UpdateQuestionCommentCommand request,
@@ -91,8 +98,11 @@ internal sealed class
             return Error.NotFound("CommentNotFound", "Comment not found");
         }
 
-        if (comment.AuthorId != request.AuthorId)
+        if (comment.AuthorId != request.UserId)
         {
+            _logger.LogError("Requested delete question comment not from author, {@authorId}, {@requestUserId}",
+                comment.AuthorId,
+                request.UserId);
             return Error.Forbidden("Not author", "Not author");
         }
 
@@ -100,7 +110,10 @@ internal sealed class
 
         if (currentTime - comment.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditCommentInMinutes))
         {
-            return Error.Conflict("TimeExpirer", "Time for update expired");
+            _logger.LogError(
+                "Time for delete expired, {@requestDateTime}, {@answerCreatedAtTime}, {@deleteAnswerTimeout}",
+                currentTime, comment.CreatedAt, _options.Value.EditCommentInMinutes);
+            return Error.Conflict("TimeExpired", "Time for update expired");
         }
 
         comment.UpdateTime = currentTime;

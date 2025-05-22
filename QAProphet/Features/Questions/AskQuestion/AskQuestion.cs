@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Data.ElasticSearch;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 
@@ -55,7 +57,7 @@ public class AskQuestion : ICarterModule
         var userId = claimsPrincipal.GetUserId();
 
         var command = request.MapToCommand(username!, userId!);
-        
+
         var response = await mediator.Send(command, cancellationToken);
 
         if (response.IsError)
@@ -68,7 +70,7 @@ public class AskQuestion : ICarterModule
 }
 
 internal sealed record AskQuestionCommand(
-    string Title, 
+    string Title,
     string Description,
     string AuthorId,
     string AuthorName,
@@ -79,16 +81,26 @@ internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, E
 {
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly ISearchService _searchService;
+    private readonly LinkGenerator _linkGenerator;
+    private readonly ILogger<AskQuestionHandler> _logger;
 
-    public AskQuestionHandler(AppDbContext dbContext, TimeProvider timeProvider)
+    public AskQuestionHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        ISearchService searchService,
+        LinkGenerator linkGenerator,
+        ILogger<AskQuestionHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
+        _searchService = searchService;
+        _linkGenerator = linkGenerator;
+        _logger = logger;
     }
-    
-    public async Task<ErrorOr<AskQuestionResponse>> Handle(
-        AskQuestionCommand request, 
 
+    public async Task<ErrorOr<AskQuestionResponse>> Handle(
+        AskQuestionCommand request,
         CancellationToken cancellationToken)
     {
         var tags = await _dbContext.Tags
@@ -100,7 +112,7 @@ internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, E
         {
             return Error.Validation("TagNotExists", "Some tag not exists");
         }
-        
+
         var question = new Question
         {
             Title = request.Title,
@@ -109,7 +121,7 @@ internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, E
             AuthorName = request.AuthorName,
             QuestionerId = Guid.Parse(request.AuthorId)
         };
-        
+
         await _dbContext.Questions.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -118,9 +130,22 @@ internal sealed class AskQuestionHandler : IRequestHandler<AskQuestionCommand, E
             QuestionId = question.Id,
             TagId = t.Id
         });
-        
+
         await _dbContext.QuestionTags.AddRangeAsync(questionTags, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            const string path = nameof(GetQuestionDetails);
+
+            var url = _linkGenerator.GetPathByName(path, new { id = question.Id });
+
+            await _searchService.IndexEntry(question.Id, question.Title, url, nameof(Question));
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "Error creating index entry");
+        }
 
         return question.MapToAskResponse();
     }

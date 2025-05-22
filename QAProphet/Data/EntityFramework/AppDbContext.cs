@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QAProphet.Domain;
 
-namespace QAProphet.Data;
+namespace QAProphet.Data.EntityFramework;
 
 public class AppDbContext : DbContext
 {

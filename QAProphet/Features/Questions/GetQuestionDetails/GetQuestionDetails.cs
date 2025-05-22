@@ -3,6 +3,7 @@ using ErrorOr;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Shared.Responses;
@@ -27,6 +28,7 @@ public class GetQuestionDetails : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/questions/{id:guid}", Handle)
+            .WithName(nameof(GetQuestionDetails))
             .WithTags(nameof(Question))
             .Produces<QuestionDetailsResponse>()
             .Produces(StatusCodes.Status404NotFound);

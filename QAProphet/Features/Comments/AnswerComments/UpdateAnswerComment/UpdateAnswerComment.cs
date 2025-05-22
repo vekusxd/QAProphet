@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Comments.Shared.Requests;
@@ -62,7 +63,7 @@ public class UpdateAnswerComment : ICarterModule
 }
 
 internal sealed record UpdateAnswerCommentCommand(
-    Guid AuthorId,
+    Guid UserId,
     Guid CommentId,
     string Content)
     : IRequest<ErrorOr<CommentResponse>>;
@@ -72,12 +73,18 @@ internal sealed class UpdateAnswerCommentHandler : IRequestHandler<UpdateAnswerC
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<AnswerTimeoutOptions> _options;
+    private readonly ILogger<UpdateAnswerCommentHandler> _logger;
 
-    public UpdateAnswerCommentHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<AnswerTimeoutOptions> options)
+    public UpdateAnswerCommentHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<AnswerTimeoutOptions> options,
+        ILogger<UpdateAnswerCommentHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<CommentResponse>> Handle(UpdateAnswerCommentCommand request,
@@ -91,15 +98,20 @@ internal sealed class UpdateAnswerCommentHandler : IRequestHandler<UpdateAnswerC
             return Error.NotFound("CommentNotFound", "Comment not found");
         }
 
-        if (comment.AuthorId != request.AuthorId)
+        if (comment.AuthorId != request.UserId)
         {
+            _logger.LogError("Requested delete answer comment not from author, {@authorId}, {@requestUserId}",
+                comment.AuthorId, request.UserId);
             return Error.Forbidden("Not author", "Not author");
         }
-        
+
         var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
 
         if (currentTime - comment.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditCommentInMinutes))
         {
+            _logger.LogError(
+                "Time for delete expired, {@requestDateTime}, {@answerCreatedAtTime}, {@deleteAnswerTimeout}",
+                currentTime, comment.CreatedAt, _options.Value.DeleteAnswerInMinutes);
             return Error.Conflict("TimeExpirer", "Time for update expired");
         }
 

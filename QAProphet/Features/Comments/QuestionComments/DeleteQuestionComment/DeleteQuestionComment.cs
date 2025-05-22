@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Options;
@@ -32,16 +33,16 @@ public class DeleteQuestionComment : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var userId = claimsPrincipal.GetUserId();
-        
+
         var deleteCommand = new DeleteQuestionCommentCommand(commentId, Guid.Parse(userId!));
-        
+
         var result = await mediator.Send(deleteCommand, cancellationToken);
 
         if (result.IsError)
         {
             return result.Errors.ToProblem();
         }
-        
+
         return Results.NoContent();
     }
 }
@@ -56,12 +57,18 @@ internal sealed class DeleteQuestionCommentHandler : IRequestHandler<DeleteQuest
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<QuestionTimeoutOptions> _options;
+    private readonly ILogger<DeleteQuestionCommentHandler> _logger;
 
-    public DeleteQuestionCommentHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<QuestionTimeoutOptions> options)
+    public DeleteQuestionCommentHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<QuestionTimeoutOptions> options,
+        ILogger<DeleteQuestionCommentHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<bool>> Handle(DeleteQuestionCommentCommand request, CancellationToken cancellationToken)
@@ -76,11 +83,19 @@ internal sealed class DeleteQuestionCommentHandler : IRequestHandler<DeleteQuest
 
         if (comment.AuthorId != request.UserId)
         {
+            _logger.LogError("Requested delete question comment not from author, {@authorId}, {@requestUserId}",
+                comment.AuthorId,
+                request.UserId);
             return Error.Forbidden("NotAuthor", "Not Author");
         }
 
-        if (_timeProvider.GetUtcNow().UtcDateTime - comment.CreatedAt > TimeSpan.FromMinutes(_options.Value.DeleteCommentInMinutes))
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
+        if (currentTime - comment.CreatedAt >
+            TimeSpan.FromMinutes(_options.Value.DeleteCommentInMinutes))
         {
+            _logger.LogError(
+                "Time for delete expired, {@requestDateTime}, {@answerCreatedAtTime}, {@deleteAnswerTimeout}",
+                currentTime, comment.CreatedAt, _options.Value.DeleteCommentInMinutes);
             return Error.Conflict("Time expired", "Time for delete expired");
         }
 

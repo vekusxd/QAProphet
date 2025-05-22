@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Options;
@@ -32,40 +33,45 @@ public class DeleteAnswer : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var userId = claimsPrincipal.GetUserId();
-        
+
         var deleteCommand = new DeleteAnswerCommand(id, Guid.Parse(userId!));
-        
+
         var result = await mediator.Send(deleteCommand, cancellationToken);
 
-        if (result.IsError)
+        if (result.HasValue)
         {
-            return result.Errors.ToProblem();
+            return result.Value.ToProblem();
         }
-        
+
         return Results.NoContent();
     }
 }
 
 internal sealed record DeleteAnswerCommand(
-    Guid AnswerId, 
+    Guid AnswerId,
     Guid UserId)
-    : IRequest<ErrorOr<bool>>;
+    : IRequest<Error?>;
 
-
-internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand, ErrorOr<bool>>
+internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand, Error?>
 {
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<AnswerTimeoutOptions> _options;
+    private readonly ILogger<DeleteAnswerHandler> _logger;
 
-    public DeleteAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<AnswerTimeoutOptions> options)
+    public DeleteAnswerHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<AnswerTimeoutOptions> options,
+        ILogger<DeleteAnswerHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
+        _logger = logger;
     }
-    
-    public async Task<ErrorOr<bool>> Handle(DeleteAnswerCommand request, CancellationToken cancellationToken)
+
+    public async Task<Error?> Handle(DeleteAnswerCommand request, CancellationToken cancellationToken)
     {
         var answer = await _dbContext.Answers
             .SingleOrDefaultAsync(a => a.Id == request.AnswerId, cancellationToken);
@@ -77,19 +83,24 @@ internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand,
 
         if (answer.AuthorId != request.UserId)
         {
+            _logger.LogError("Requested delete answer not from author, {@authorId}, {@requestUserId}", answer.AuthorId,
+                request.UserId);
             return Error.Forbidden("NotAuthor", "Not author");
         }
-        
+
         var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
 
         if (currentTime - answer.CreatedAt > TimeSpan.FromMinutes(_options.Value.DeleteAnswerInMinutes))
         {
+            _logger.LogError(
+                "Time for delete expired, {@requestDateTime}, {@answerCreatedAtTime}, {@deleteAnswerTimeout}",
+                currentTime, answer.CreatedAt, _options.Value.DeleteAnswerInMinutes);
             return Error.Conflict("TimeExpired", "time for delete expired");
         }
 
         answer.IsDeleted = true;
         _dbContext.Answers.Update(answer);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return null;
     }
 }

@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Answers.Shared.Mapping;
@@ -38,7 +39,7 @@ public class EditAnswer : ICarterModule
         ClaimsPrincipal claimsPrincipal,
         IMediator mediator,
         CancellationToken cancellationToken = default
-        )
+    )
     {
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
@@ -48,9 +49,9 @@ public class EditAnswer : ICarterModule
         }
 
         var userId = claimsPrincipal.GetUserId();
-        
+
         var command = new EditAnswerCommand(id, Guid.Parse(userId!), request.Content);
-        
+
         var result = await mediator.Send(command, cancellationToken);
 
         if (result.IsError)
@@ -68,48 +69,59 @@ internal sealed record EditAnswerCommand(
     string Content)
     : IRequest<ErrorOr<AnswerUpdateResponse>>;
 
-
 internal sealed class EditAnswerHandler : IRequestHandler<EditAnswerCommand, ErrorOr<AnswerUpdateResponse>>
 {
+    private readonly ILogger<EditAnswerHandler> _logger;
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<AnswerTimeoutOptions> _options;
 
-    public EditAnswerHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<AnswerTimeoutOptions> options)
+    public EditAnswerHandler(
+        ILogger<EditAnswerHandler> logger,
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<AnswerTimeoutOptions> options)
     {
+        _logger = logger;
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
     }
-    
-    public async Task<ErrorOr<AnswerUpdateResponse>> Handle(EditAnswerCommand request, CancellationToken cancellationToken)
+
+    public async Task<ErrorOr<AnswerUpdateResponse>> Handle(EditAnswerCommand request,
+        CancellationToken cancellationToken)
     {
-       var answer = await _dbContext.Answers
-           .SingleOrDefaultAsync(x => x.Id == request.AnswerId, cancellationToken);
+        var answer = await _dbContext.Answers
+            .SingleOrDefaultAsync(x => x.Id == request.AnswerId, cancellationToken);
 
-       if (answer is null)
-       {
-           return Error.NotFound("AnswerNotFound", "Answer not found");
-       }
+        if (answer is null)
+        {
+            return Error.NotFound("AnswerNotFound", "Answer not found");
+        }
 
-       if (answer.AuthorId != request.UserId)
-       {
-           return Error.Forbidden("Not author", "Not author");
-       }
-       
+        if (answer.AuthorId != request.UserId)
+        {
+            _logger.LogError("Edit request not from author, {@authorId}, {@requestUserId}", answer.AuthorId,
+                request.UserId);
+            return Error.Forbidden("Not author", "Not author");
+        }
+
         var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
-       
-       if (currentTime - answer.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditAnswerInMinutes))
-       {
-           return Error.Conflict("Time expired", "time for update expired");
-       }
-       
-       answer.Content = request.Content;
-       answer.UpdatedAt = currentTime;
-       
-       _dbContext.Answers.Update(answer);
-       await _dbContext.SaveChangesAsync(cancellationToken);
 
-       return answer.MapToUpdateResponse();
+        if (currentTime - answer.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditAnswerInMinutes))
+        {
+            _logger.LogError(
+                "Edit answer time expired, {@requestDateTime}, {@answerCreatedAtTime}, {@answerUpdateTimeout}",
+                currentTime, answer.CreatedAt, _options.Value.EditAnswerInMinutes);
+            return Error.Conflict("Time expired", "time for update expired");
+        }
+
+        answer.Content = request.Content;
+        answer.UpdatedAt = currentTime;
+
+        _dbContext.Answers.Update(answer);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return answer.MapToUpdateResponse();
     }
 }

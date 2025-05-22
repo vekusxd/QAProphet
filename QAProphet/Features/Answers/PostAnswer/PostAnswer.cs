@@ -5,6 +5,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 
@@ -19,7 +20,7 @@ public sealed record PostAnswerResponse(
     Guid Id,
     string Content,
     DateTime Created,
-    Guid AuthorId,
+    Guid UserId,
     string AuthorName);
 
 public class PostAnswer : ICarterModule
@@ -66,7 +67,7 @@ public class PostAnswer : ICarterModule
 
 internal sealed record PostAnswerCommand(
     Guid QuestionId,
-    Guid AuthorId,
+    Guid UserId,
     string AuthorName,
     string Content
 ) : IRequest<ErrorOr<PostAnswerResponse>>;
@@ -96,7 +97,7 @@ internal sealed record PostAnswerHandler : IRequestHandler<PostAnswerCommand, Er
 
         var answer = new Answer
         {
-            AuthorId = request.AuthorId,
+            AuthorId = request.UserId,
             AuthorName = request.AuthorName,
             Content = request.Content,
             CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,

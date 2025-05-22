@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QAProphet.Domain;
 
-namespace QAProphet.Data.Configurations;
+namespace QAProphet.Data.EntityFramework.Configurations;
 
 public class AnswerConfiguration : IEntityTypeConfiguration<Answer>
 {

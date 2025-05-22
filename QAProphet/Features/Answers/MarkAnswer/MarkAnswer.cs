@@ -4,6 +4,7 @@ using ErrorOr;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 using QAProphet.Features.Answers.Shared.Mapping;
@@ -46,16 +47,18 @@ public class MarkAnswer : ICarterModule
     }
 }
 
-internal sealed record MarkAnswerCommand(Guid AnswerId, Guid AuthorId)
+internal sealed record MarkAnswerCommand(Guid AnswerId, Guid UserId)
     : IRequest<ErrorOr<AnswerUpdateResponse>>;
 
 internal sealed class MarkAnswerHandler : IRequestHandler<MarkAnswerCommand, ErrorOr<AnswerUpdateResponse>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly ILogger<MarkAnswerHandler> _logger;
 
-    public MarkAnswerHandler(AppDbContext dbContext)
+    public MarkAnswerHandler(AppDbContext dbContext, ILogger<MarkAnswerHandler> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<AnswerUpdateResponse>> Handle(MarkAnswerCommand request,
@@ -70,16 +73,19 @@ internal sealed class MarkAnswerHandler : IRequestHandler<MarkAnswerCommand, Err
             return Error.NotFound("AnswerNotFound", "Answer not found");
         }
         
-        if (answer.Question.QuestionerId != request.AuthorId)
+        if (answer.Question.QuestionerId != request.UserId)
         {
+            _logger.LogError("Mark answer request not from author, {@authorId}, {@requestUserId}", answer.AuthorId,
+                request.UserId);
             return Error.Forbidden("NotAuthor", "Not author");
         }
 
         var bestSet = await _dbContext.Answers
-            .AnyAsync(a => a.QuestionId == answer.QuestionId && a.IsBest == true, cancellationToken: cancellationToken);
-
-        if (bestSet)
+            .FirstOrDefaultAsync(a => a.QuestionId == answer.QuestionId && a.IsBest == true, cancellationToken: cancellationToken);
+        
+        if (bestSet is not null)
         {
+            _logger.LogError("Best answer already set {@questionId}, {@bestAnswerId}", answer.QuestionId, bestSet.Id);
             return Error.Conflict("BestAnswerSet", "Best answer already set");
         }
 

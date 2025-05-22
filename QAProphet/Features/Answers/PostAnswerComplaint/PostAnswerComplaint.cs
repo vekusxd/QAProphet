@@ -5,6 +5,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QAProphet.Data;
+using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
 
@@ -36,7 +37,7 @@ public class PostAnswerComplaint : ICarterModule
         CancellationToken cancellationToken = default)
     {
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
-        
+
         if (!validationResult.IsValid)
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
@@ -67,11 +68,14 @@ internal sealed class PostAnswerComplaintHandler : IRequestHandler<PostAnswerCom
 {
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly ILogger<PostAnswerComplaintHandler> _logger;
 
-    public PostAnswerComplaintHandler(AppDbContext dbContext, TimeProvider timeProvider)
+    public PostAnswerComplaintHandler(AppDbContext dbContext, TimeProvider timeProvider,
+        ILogger<PostAnswerComplaintHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
+        _logger = logger;
     }
 
     public async Task<Error?> Handle(PostAnswerComplaintCommand request, CancellationToken cancellationToken)
@@ -92,13 +96,16 @@ internal sealed class PostAnswerComplaintHandler : IRequestHandler<PostAnswerCom
             return Error.NotFound("ComplaintCategory not found", "ComplaintCategory was not found");
         }
 
-        if (await _dbContext.AnswerComplaints.AnyAsync(
-                c => c.AnswerId == request.AnswerId && c.UserId == request.UserId, cancellationToken))
+        var complaint = await _dbContext.AnswerComplaints.FirstOrDefaultAsync(
+            c => c.AnswerId == request.AnswerId && c.UserId == request.UserId, cancellationToken);
+
+        if (complaint is not null)
         {
+            _logger.LogError("Complaint already posted {@complaintId}", complaint.Id);
             return Error.Conflict("Complaint already posted", "Complaint already posted");
         }
 
-        var complaint = new AnswerComplaint
+        complaint = new AnswerComplaint
         {
             AnswerId = answer.Id,
             CategoryId = category.Id,
@@ -108,7 +115,7 @@ internal sealed class PostAnswerComplaintHandler : IRequestHandler<PostAnswerCom
 
         await _dbContext.AnswerComplaints.AddAsync(complaint, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
+
         return null;
     }
 }
