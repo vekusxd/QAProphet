@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using QAProphet.Data;
 using QAProphet.Data.EntityFramework;
 
 #nullable disable
@@ -378,9 +377,6 @@ namespace QAProphet.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("QuestionsCount")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()

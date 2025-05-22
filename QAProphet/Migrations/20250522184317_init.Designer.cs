@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using QAProphet.Data;
 using QAProphet.Data.EntityFramework;
 
 #nullable disable
@@ -13,8 +12,8 @@ using QAProphet.Data.EntityFramework;
 namespace QAProphet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250420085319_CommentUpdateTimeColumn")]
-    partial class CommentUpdateTimeColumn
+    [Migration("20250522184317_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,9 +47,6 @@ namespace QAProphet.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Dislikes")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsBest")
                         .HasColumnType("boolean");
 
@@ -62,6 +58,9 @@ namespace QAProphet.Migrations
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -95,14 +94,8 @@ namespace QAProphet.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Dislikes")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("Likes")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("timestamp with time zone");
@@ -114,6 +107,83 @@ namespace QAProphet.Migrations
                     b.ToTable("AnswerComments");
                 });
 
+            modelBuilder.Entity("QAProphet.Domain.AnswerComplaint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AnswerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnswerId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("AnswerComplaints");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.AnswerComplaintCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(96)
+                        .HasColumnType("character varying(96)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AnswerComplaintCategories");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.AnswerLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AnswerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnswerId");
+
+                    b.ToTable("AnswerLikes");
+                });
+
             modelBuilder.Entity("QAProphet.Domain.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -122,7 +192,8 @@ namespace QAProphet.Migrations
 
                     b.Property<string>("AuthorName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -173,14 +244,8 @@ namespace QAProphet.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Dislikes")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("Likes")
-                        .HasColumnType("integer");
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
@@ -193,6 +258,83 @@ namespace QAProphet.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("QuestionComments");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.QuestionComplaint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionComplaints");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.QuestionComplaintCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(96)
+                        .HasColumnType("character varying(96)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QuestionComplaintCategories");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.QuestionSubscribe", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionSubscribes");
                 });
 
             modelBuilder.Entity("QAProphet.Domain.QuestionTags", b =>
@@ -252,6 +394,31 @@ namespace QAProphet.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("QAProphet.Domain.TagSubscribe", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("TagSubscribes");
+                });
+
             modelBuilder.Entity("QAProphet.Domain.Answer", b =>
                 {
                     b.HasOne("QAProphet.Domain.Question", "Question")
@@ -274,10 +441,70 @@ namespace QAProphet.Migrations
                     b.Navigation("Answer");
                 });
 
+            modelBuilder.Entity("QAProphet.Domain.AnswerComplaint", b =>
+                {
+                    b.HasOne("QAProphet.Domain.Answer", "Answer")
+                        .WithMany("Complaints")
+                        .HasForeignKey("AnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QAProphet.Domain.AnswerComplaintCategory", "Category")
+                        .WithMany("Complaints")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.AnswerLike", b =>
+                {
+                    b.HasOne("QAProphet.Domain.Answer", "Answer")
+                        .WithMany("AnswerLikes")
+                        .HasForeignKey("AnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
+                });
+
             modelBuilder.Entity("QAProphet.Domain.QuestionComment", b =>
                 {
                     b.HasOne("QAProphet.Domain.Question", "Question")
                         .WithMany("Comments")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.QuestionComplaint", b =>
+                {
+                    b.HasOne("QAProphet.Domain.QuestionComplaintCategory", "Category")
+                        .WithMany("Complaints")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QAProphet.Domain.Question", "Question")
+                        .WithMany("Complaints")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.QuestionSubscribe", b =>
+                {
+                    b.HasOne("QAProphet.Domain.Question", "Question")
+                        .WithMany("Subscribers")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -304,9 +531,29 @@ namespace QAProphet.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("QAProphet.Domain.TagSubscribe", b =>
+                {
+                    b.HasOne("QAProphet.Domain.Tag", "Tag")
+                        .WithMany("Subscribers")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("QAProphet.Domain.Answer", b =>
                 {
+                    b.Navigation("AnswerLikes");
+
                     b.Navigation("Comments");
+
+                    b.Navigation("Complaints");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.AnswerComplaintCategory", b =>
+                {
+                    b.Navigation("Complaints");
                 });
 
             modelBuilder.Entity("QAProphet.Domain.Question", b =>
@@ -315,12 +562,23 @@ namespace QAProphet.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Complaints");
+
+                    b.Navigation("Subscribers");
+
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("QAProphet.Domain.QuestionComplaintCategory", b =>
+                {
+                    b.Navigation("Complaints");
                 });
 
             modelBuilder.Entity("QAProphet.Domain.Tag", b =>
                 {
                     b.Navigation("Questions");
+
+                    b.Navigation("Subscribers");
                 });
 #pragma warning restore 612, 618
         }

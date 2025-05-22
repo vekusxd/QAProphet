@@ -10,13 +10,6 @@ using QAProphet.Features.Shared.Responses;
 
 namespace QAProphet.Features.Questions.GetQuestions;
 
-public sealed record QuestionResponse(
-    Guid Id,
-    string Title,
-    DateTime CreatedAt,
-    string AuthorName, 
-    List<TagResponse> Tags);
-
 public class GetQuestions : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
