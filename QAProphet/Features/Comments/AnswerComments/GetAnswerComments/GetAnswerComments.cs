@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
+using QAProphet.Features.Comments.Shared.Responses;
 using QAProphet.Features.Shared.Mappings;
 using QAProphet.Features.Shared.Responses;
 
 namespace QAProphet.Features.Comments.AnswerComments.GetAnswerComments;
 
-public record GetAnswerCommentsResponse(int Total, ICollection<CommentResponse> Comments);
 
 public class GetAnswerComments : ICarterModule
 {
@@ -19,7 +19,7 @@ public class GetAnswerComments : ICarterModule
     {
         app.MapGet("/api/answers/comments/{answerId:guid}", Handle)
             .WithTags(nameof(AnswerComment))
-            .Produces<GetAnswerCommentsResponse>();
+            .Produces<PaginatedCommentResponse>();
     }
 
     private static async Task<IResult> Handle(
@@ -46,23 +46,23 @@ internal sealed record GetAnswerCommentsQuery(
     Guid AnswerId,
     int PageNumber,
     int PageSize)
-    : IRequest<ErrorOr<GetAnswerCommentsResponse>>;
+    : IRequest<ErrorOr<PaginatedCommentResponse>>;
 
 internal sealed class GetAnswerCommentsHandler
-    : IRequestHandler<GetAnswerCommentsQuery, ErrorOr<GetAnswerCommentsResponse>>
+    : IRequestHandler<GetAnswerCommentsQuery, ErrorOr<PaginatedCommentResponse>>
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _dbContext;
 
-    public GetAnswerCommentsHandler(AppDbContext context)
+    public GetAnswerCommentsHandler(AppDbContext dbContext)
     {
-        _context = context;
+        _dbContext = dbContext;
     }
 
-    public async Task<ErrorOr<GetAnswerCommentsResponse>> Handle(GetAnswerCommentsQuery request,
+    public async Task<ErrorOr<PaginatedCommentResponse>> Handle(GetAnswerCommentsQuery request,
         CancellationToken cancellationToken)
     {
         var exists =
-            await _context.Answers.AnyAsync(a => a.Id == request.AnswerId, cancellationToken);
+            await _dbContext.Answers.AnyAsync(a => a.Id == request.AnswerId, cancellationToken);
 
         if (!exists)
         {
@@ -71,7 +71,7 @@ internal sealed class GetAnswerCommentsHandler
 
         var offset = (request.PageNumber - 1) * request.PageSize;
 
-        var comments = await _context.AnswerComments
+        var comments = await _dbContext.AnswerComments
             .AsNoTracking()
             .Where(a => a.AnswerId == request.AnswerId)
             .Skip(offset)
@@ -79,8 +79,8 @@ internal sealed class GetAnswerCommentsHandler
             .OrderByDescending(ac => ac.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        var total = await _context.AnswerComments.CountAsync(a => a.AnswerId == request.AnswerId, cancellationToken);
+        var total = await _dbContext.AnswerComments.CountAsync(a => a.AnswerId == request.AnswerId, cancellationToken);
         
-        return new GetAnswerCommentsResponse(total, comments.Select(c => c.MapToResponse()).ToList());
+        return new PaginatedCommentResponse(total, comments.Select(c => c.MapToResponse()).ToList());
     }
 }
