@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.ElasticSearch;
 using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
@@ -44,18 +45,18 @@ public class EditQuestion : ICarterModule
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-        
+
         var userId = claimsPrincipal.GetUserId();
-        
-        var command = request.MapToUpdateCommand(id,Guid.Parse(userId!));
-        
+
+        var command = request.MapToUpdateCommand(id, Guid.Parse(userId!));
+
         var result = await mediator.Send(command, cancellationToken);
 
         if (result.IsError)
         {
             return result.Errors.ToProblem();
         }
-        
+
         return Results.NoContent();
     }
 }
@@ -73,36 +74,48 @@ internal sealed class EditQuestionHandler : IRequestHandler<EditQuestionCommand,
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<QuestionTimeoutOptions> _options;
+    private readonly ISearchService _searchService;
+    private readonly LinkGenerator _linkGenerator;
+    private readonly ILogger<EditQuestionHandler> _logger;
 
-    public EditQuestionHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<QuestionTimeoutOptions> options)
+    public EditQuestionHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<QuestionTimeoutOptions> options,
+        ISearchService searchService,
+        LinkGenerator linkGenerator,
+        ILogger<EditQuestionHandler> logger)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
+        _searchService = searchService;
+        _linkGenerator = linkGenerator;
+        _logger = logger;
     }
-    
+
     public async Task<ErrorOr<bool>> Handle(EditQuestionCommand request, CancellationToken cancellationToken)
     {
         var question =
             await _dbContext.Questions.FirstOrDefaultAsync(q => q.Id == request.QuestionId, cancellationToken);
-        
+
         if (question is null)
         {
             return Error.NotFound("QuestionNotFound", "Question not found");
         }
-        
+
         if (question.QuestionerId != request.AuthorId)
         {
             return Error.Forbidden("NotAuthor", "Not Author");
         }
-        
+
         var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
-        
+
         if (currentTime - question.CreatedAt > TimeSpan.FromMinutes(_options.Value.EditQuestionInMinutes))
         {
             return Error.Conflict("Time expired", "time for update expired");
         }
-        
+
         var tags = await _dbContext.Tags
             .AsNoTracking()
             .Where(t => request.Tags.Contains(t.Id))
@@ -112,22 +125,34 @@ internal sealed class EditQuestionHandler : IRequestHandler<EditQuestionCommand,
         {
             return Error.Validation("TagNotExists", "Some tag not exists");
         }
-        
+
         question.Title = request.Title;
         question.Content = request.Content;
         question.UpdateTime = currentTime;
-        
+
         var questionTags = tags
-            .Select(t => new QuestionTags{QuestionId = request.QuestionId, TagId = t.Id})
+            .Select(t => new QuestionTags { QuestionId = request.QuestionId, TagId = t.Id })
             .ToList();
 
         await _dbContext.QuestionTags
             .Where(t => t.QuestionId == request.QuestionId)
             .ExecuteDeleteAsync(cancellationToken);
         await _dbContext.QuestionTags.AddRangeAsync(questionTags, cancellationToken);
-        
+
         _dbContext.Update(question);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var link = _linkGenerator.GetPathByName(nameof(GetQuestionDetails), new { id = question.Id });
+
+        try
+        {
+            await _searchService.AddOrUpdateEntry(question.Id, question.Title, link, nameof(Question));
+        }
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogError(ex, "Error indexing question with id {@questionId}", question.Id);
+        }
+
         return true;
     }
 }
