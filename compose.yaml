@@ -6,6 +6,8 @@
     depends_on:
       - qaprophet_db
       - qaprophet_identity
+      - seq
+      - elastic
     build:
       context: .
       dockerfile: QAProphet/Dockerfile
