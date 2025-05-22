@@ -1,0 +1,7 @@
+@startuml
+abstract class BaseEntity {
+    + Id : Guid <<get>> <<init>>
+    + IsDeleted : bool <<get>> <<set>>
+    + CreatedAt : DateTime <<get>> <<init>>
+}
+@enduml

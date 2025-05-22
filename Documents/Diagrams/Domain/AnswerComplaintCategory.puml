@@ -1,0 +1,7 @@
+@startuml
+class AnswerComplaintCategory {
+    + <<required>> Title : string <<get>> <<set>>
+    + Complaints : ICollection<AnswerComplaint> <<get>> <<set>>
+}
+BaseEntity <|-- AnswerComplaintCategory
+@enduml

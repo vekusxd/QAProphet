@@ -1,0 +1,9 @@
+@startuml
+class QuestionTags {
+    + <<required>> QuestionId : Guid <<get>> <<init>>
+    + Question : Question <<get>> <<init>>
+    + <<required>> TagId : Guid <<get>> <<init>>
+    + Tag : Tag <<get>> <<init>>
+}
+BaseEntity <|-- QuestionTags
+@enduml

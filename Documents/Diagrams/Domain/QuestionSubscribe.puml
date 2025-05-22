@@ -1,0 +1,8 @@
+@startuml
+class QuestionSubscribe {
+    + <<required>> UserId : Guid <<get>> <<init>>
+    + <<required>> QuestionId : Guid <<get>> <<init>>
+    + Question : Question <<get>> <<init>>
+}
+BaseEntity <|-- QuestionSubscribe
+@enduml

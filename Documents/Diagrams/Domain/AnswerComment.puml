@@ -1,0 +1,7 @@
+@startuml
+class AnswerComment {
+    + <<required>> AnswerId : Guid <<get>> <<init>>
+    + Answer : Answer <<get>> <<init>>
+}
+BaseComment <|-- AnswerComment
+@enduml

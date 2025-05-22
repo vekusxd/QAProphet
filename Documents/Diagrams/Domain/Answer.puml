@@ -1,0 +1,16 @@
+@startuml
+class Answer {
+    + <<required>> Content : string <<get>> <<set>>
+    + AuthorId : Guid <<get>> <<init>>
+    + <<required>> AuthorName : string <<get>> <<set>>
+    + QuestionId : Guid <<get>> <<init>>
+    + Question : Question <<get>> <<init>>
+    + Likes : int <<get>> <<set>>
+    + IsBest : bool <<get>> <<set>>
+    + UpdatedAt : DateTime? <<get>> <<set>>
+    + Comments : ICollection<AnswerComment> <<get>> <<set>>
+    + AnswerLikes : ICollection<AnswerLike> <<get>> <<set>>
+    + Complaints : ICollection<AnswerComplaint> <<get>> <<set>>
+}
+BaseEntity <|-- Answer
+@enduml

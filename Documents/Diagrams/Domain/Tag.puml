@@ -1,0 +1,9 @@
+@startuml
+class Tag {
+    + <<required>> Title : string <<get>> <<set>>
+    + <<required>> Description : string <<get>> <<set>>
+    + Questions : ICollection<QuestionTags> <<get>> <<set>>
+    + Subscribers : ICollection<TagSubscribe> <<get>> <<set>>
+}
+BaseEntity <|-- Tag
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+abstract class BaseComment {
+    + <<required>> Content : string <<get>> <<set>>
+    + <<required>> AuthorId : Guid <<get>> <<init>>
+    + UpdateTime : DateTime? <<get>> <<set>>
+    + <<required>> AuthorName : string <<get>> <<init>>
+}
+BaseEntity <|-- BaseComment
+@enduml

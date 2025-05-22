@@ -1,0 +1,15 @@
+@startuml
+class Question {
+    + <<required>> Title : string <<get>> <<set>>
+    + <<required>> Content : string <<get>> <<set>>
+    + UpdateTime : DateTime? <<get>> <<set>>
+    + <<required>> QuestionerId : Guid <<get>> <<init>>
+    + <<required>> AuthorName : string <<get>> <<set>>
+    + Answers : ICollection<Answer> <<get>> <<set>>
+    + Comments : ICollection<QuestionComment> <<get>> <<set>>
+    + Tags : ICollection<QuestionTags> <<get>> <<set>>
+    + Subscribers : ICollection<QuestionSubscribe> <<get>> <<set>>
+    + Complaints : ICollection<QuestionComplaint> <<get>> <<set>>
+}
+BaseEntity <|-- Question
+@enduml

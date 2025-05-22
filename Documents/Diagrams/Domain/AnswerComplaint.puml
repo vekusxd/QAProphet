@@ -1,0 +1,10 @@
+@startuml
+class AnswerComplaint {
+    + <<required>> UserId : Guid <<get>> <<init>>
+    + <<required>> AnswerId : Guid <<get>> <<init>>
+    + Answer : Answer <<get>> <<init>>
+    + <<required>> CategoryId : Guid <<get>> <<init>>
+    + Category : AnswerComplaintCategory <<get>> <<init>>
+}
+BaseEntity <|-- AnswerComplaint
+@enduml

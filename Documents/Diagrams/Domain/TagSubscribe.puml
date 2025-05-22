@@ -1,0 +1,8 @@
+@startuml
+class TagSubscribe {
+    + <<required>> UserId : Guid <<get>> <<init>>
+    + <<required>> TagId : Guid <<get>> <<init>>
+    + Tag : Tag <<get>> <<init>>
+}
+BaseEntity <|-- TagSubscribe
+@enduml

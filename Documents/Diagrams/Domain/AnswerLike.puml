@@ -1,0 +1,8 @@
+@startuml
+class AnswerLike {
+    + <<required>> AnswerId : Guid <<get>> <<init>>
+    + Answer : Answer <<get>> <<init>>
+    + <<required>> AuthorId : Guid <<get>> <<init>>
+}
+BaseEntity <|-- AnswerLike
+@enduml
