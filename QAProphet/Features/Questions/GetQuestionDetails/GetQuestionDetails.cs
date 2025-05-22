@@ -21,7 +21,7 @@ public sealed record QuestionDetailsResponse(
     DateTime Created,
     DateTime? Updated,
     List<TagResponse> Tags,
-    List<AnswerResponse> Answers,
+    int CommentsCount,
     int AnswersCount);
 
 public class GetQuestionDetails : ICarterModule
@@ -37,11 +37,10 @@ public class GetQuestionDetails : ICarterModule
 
     private static async Task<IResult> Handle(
         Guid id,
-        [FromQuery] int? answersCount,
         IMediator mediator,
         CancellationToken cancellationToken)
     {
-        var query = new GetQuestionDetailsQuery(id, answersCount ?? 10);
+        var query = new GetQuestionDetailsQuery(id);
         var result = await mediator.Send(query, cancellationToken);
 
         if (result.IsError)
@@ -54,8 +53,7 @@ public class GetQuestionDetails : ICarterModule
 }
 
 internal sealed record GetQuestionDetailsQuery(
-    Guid QuestionId,
-    int AnswersCount)
+    Guid QuestionId)
     : IRequest<ErrorOr<QuestionDetailsResponse>>;
 
 internal sealed class
@@ -72,13 +70,8 @@ internal sealed class
         CancellationToken cancellationToken)
     {
         var question = await _dbContext.Questions
-            .Include(q => q.Answers
-                .OrderByDescending(a => a.CreatedAt)
-                .ThenByDescending(a => a.IsBest)
-                .Take(request.AnswersCount))
             .Include(q => q.Tags)
             .ThenInclude(t => t.Tag)
-            .AsSplitQuery()
             .AsNoTracking()
             .FirstOrDefaultAsync(q => q.Id == request.QuestionId, cancellationToken);
 
@@ -91,6 +84,9 @@ internal sealed class
         var answersCount = await _dbContext.Answers.CountAsync(q => q.QuestionId == request.QuestionId,
             cancellationToken: cancellationToken);
 
-        return question.MapToDetailsResponse(answersCount);
+        var commentsCount = await _dbContext.QuestionComments.CountAsync(q => q.QuestionId == request.QuestionId,
+            cancellationToken);
+
+        return question.MapToDetailsResponse(commentsCount, answersCount);
     }
 }

@@ -19,12 +19,11 @@ public class GetQuestions : ICarterModule
             .Produces<List<QuestionResponse>>();
     }
 
-    private static async Task<Ok<List<QuestionResponse>>> Handle(
+    private static async Task<IResult> Handle(
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         IMediator mediator,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         page ??= 1;
         pageSize ??= 10;
@@ -35,7 +34,7 @@ public class GetQuestions : ICarterModule
 
         var response = await mediator.Send(query, cancellationToken);
 
-        return TypedResults.Ok(response);
+        return Results.Ok(response);
     }
 }
 

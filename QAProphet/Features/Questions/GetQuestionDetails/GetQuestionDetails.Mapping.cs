@@ -7,7 +7,7 @@ namespace QAProphet.Features.Questions.GetQuestionDetails;
 
 internal static class GetQuestionDetailsMappingExtensions
 {
-    public static QuestionDetailsResponse MapToDetailsResponse(this Question question, int answersCount)
+    public static QuestionDetailsResponse MapToDetailsResponse(this Question question, int commentsCount,int answersCount)
         => new(
             question.Id,
             question.Title,
@@ -19,8 +19,6 @@ internal static class GetQuestionDetailsMappingExtensions
             question.Tags
                 .Select(t => new TagResponse(t.TagId, t.Tag.Title))
                 .ToList(),
-            question.Answers
-                .Select(a => a.MapToAnswerResponse())
-                .ToList(),
+            commentsCount,
             answersCount);
 }

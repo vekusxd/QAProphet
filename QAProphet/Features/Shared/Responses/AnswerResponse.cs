@@ -6,6 +6,5 @@ public record AnswerResponse(
     DateTime Created,
     Guid AuthorId,
     string AuthorName,
-    List<CommentResponse> Comments,
     bool IsSolution,
     int Likes);
