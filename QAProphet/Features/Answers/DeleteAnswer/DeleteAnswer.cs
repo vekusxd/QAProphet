@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.ElasticSearch;
 using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
@@ -58,17 +59,20 @@ internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand,
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<AnswerTimeoutOptions> _options;
     private readonly ILogger<DeleteAnswerHandler> _logger;
+    private readonly ISearchService _searchService;
 
     public DeleteAnswerHandler(
         AppDbContext dbContext,
         TimeProvider timeProvider,
         IOptions<AnswerTimeoutOptions> options,
-        ILogger<DeleteAnswerHandler> logger)
+        ILogger<DeleteAnswerHandler> logger,
+        ISearchService searchService)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
         _logger = logger;
+        _searchService = searchService;
     }
 
     public async Task<Error?> Handle(DeleteAnswerCommand request, CancellationToken cancellationToken)
@@ -101,6 +105,9 @@ internal sealed class DeleteAnswerHandler : IRequestHandler<DeleteAnswerCommand,
         answer.IsDeleted = true;
         _dbContext.Answers.Update(answer);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _searchService.RemoveEntry(request.AnswerId);
+        
         return null;
     }
 }

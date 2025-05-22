@@ -1,6 +1,8 @@
 ﻿using ErrorOr;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
+using Moq;
+using QAProphet.Data.ElasticSearch;
 using QAProphet.Domain;
 using QAProphet.Features.Questions.DeleteQuestion;
 using QAProphet.Options;
@@ -29,8 +31,12 @@ public sealed class DeleteQuestionCommandHandlerTests : IAsyncLifetime
 
         var dbContext = _dbConnectionFixture.DbContext;
         var timeProvider = new FakeTimeProvider();
+        
+        var searchService = new Mock<ISearchService>();
+        searchService.Setup(s => s.RemoveEntry(It.IsAny<Guid>()))
+            .ReturnsAsync(true);
 
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options, searchService.Object);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -62,9 +68,13 @@ public sealed class DeleteQuestionCommandHandlerTests : IAsyncLifetime
 
         dbContext.Questions.Add(question);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        
+        var searchService = new Mock<ISearchService>();
+        searchService.Setup(s => s.RemoveEntry(It.IsAny<Guid>()))
+            .ReturnsAsync(true);
 
         var command = new DeleteQuestionCommand(questionId, Guid.NewGuid());
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options, searchService.Object);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -98,9 +108,13 @@ public sealed class DeleteQuestionCommandHandlerTests : IAsyncLifetime
 
         dbContext.Questions.Add(question);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        
+        var searchService = new Mock<ISearchService>();
+        searchService.Setup(s => s.RemoveEntry(It.IsAny<Guid>()))
+            .ReturnsAsync(true);
 
         var command = new DeleteQuestionCommand(questionId, authorId);
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options, searchService.Object);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -132,9 +146,13 @@ public sealed class DeleteQuestionCommandHandlerTests : IAsyncLifetime
 
         dbContext.Questions.Add(question);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        
+        var searchService = new Mock<ISearchService>();
+        searchService.Setup(s => s.RemoveEntry(It.IsAny<Guid>()))
+            .ReturnsAsync(true);
 
         var command = new DeleteQuestionCommand(questionId, authorId);
-        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options);
+        var handler = new DeleteQuestionHandler(dbContext, timeProvider, _options, searchService.Object);
 
         //act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);

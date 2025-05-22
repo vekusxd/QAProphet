@@ -1,14 +1,20 @@
-﻿using QAProphet.Domain;
+﻿using Elastic.Clients.Elasticsearch;
+using Microsoft.EntityFrameworkCore;
+using QAProphet.Data.ElasticSearch;
+using QAProphet.Domain;
+using QAProphet.Features.Tags.GetTagDetails;
 
 namespace QAProphet.Data.EntityFramework;
 
 public class Seed
 {
     private readonly AppDbContext _dbContext;
+    private readonly ElasticsearchClient _client;
 
-    public Seed(AppDbContext dbContext)
+    public Seed(AppDbContext dbContext, ElasticsearchClient client)
     {
         _dbContext = dbContext;
+        _client = client;
     }
 
     public async Task SeedTags()
@@ -93,14 +99,31 @@ public class Seed
         ];
 
         if (_dbContext.Tags.Any()) return;
-        
+
         _dbContext.Tags.AddRange(tags);
         await _dbContext.SaveChangesAsync();
+
+        tags = await _dbContext.Tags.ToListAsync();
+
+        var urls = tags.Select(t => $"/api/tags/{t.Id}").ToList();
+
+        var entries = tags.Zip(urls, (tag, url) => new IndexEntry
+        {
+            Id = tag.Id,
+            Title = tag.Title,
+            Type = nameof(Tag),
+            Url = url ?? throw new ArgumentException(nameof(url))
+        }).ToList();
+
+        await _client.BulkAsync(b => b
+            .Index(IndexEntry.IndexName)
+            .IndexMany(entries)
+        );
     }
 
     public async Task SeedComplaintCategories()
     {
-        List<QuestionComplaintCategory> questionComplaintCategories = 
+        List<QuestionComplaintCategory> questionComplaintCategories =
         [
             new()
             {
@@ -128,7 +151,7 @@ public class Seed
             }
         ];
 
-        List<AnswerComplaintCategory> answerComplaintCategories = 
+        List<AnswerComplaintCategory> answerComplaintCategories =
         [
             new()
             {
@@ -155,13 +178,13 @@ public class Seed
                 Title = "Другое"
             }
         ];
-        
-        if (!_dbContext.QuestionComplaintCategories.Any()) 
+
+        if (!_dbContext.QuestionComplaintCategories.Any())
             _dbContext.QuestionComplaintCategories.AddRange(questionComplaintCategories);
-        
+
         if (!_dbContext.AnswerComplaintCategories.Any())
             _dbContext.AnswerComplaintCategories.AddRange(answerComplaintCategories);
-        
+
         await _dbContext.SaveChangesAsync();
     }
 }

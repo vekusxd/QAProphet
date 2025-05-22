@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QAProphet.Data;
+using QAProphet.Data.ElasticSearch;
 using QAProphet.Data.EntityFramework;
 using QAProphet.Domain;
 using QAProphet.Extensions;
@@ -56,12 +57,18 @@ internal sealed class DeleteQuestionHandler : IRequestHandler<DeleteQuestionComm
     private readonly AppDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly IOptions<QuestionTimeoutOptions> _options;
+    private readonly ISearchService _searchService;
 
-    public DeleteQuestionHandler(AppDbContext dbContext, TimeProvider timeProvider, IOptions<QuestionTimeoutOptions> options)
+    public DeleteQuestionHandler(
+        AppDbContext dbContext,
+        TimeProvider timeProvider,
+        IOptions<QuestionTimeoutOptions> options,
+        ISearchService searchService)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _options = options;
+        _searchService = searchService;
     }
 
     public async Task<ErrorOr<bool>> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken)
@@ -79,14 +86,17 @@ internal sealed class DeleteQuestionHandler : IRequestHandler<DeleteQuestionComm
             return Error.Forbidden("NotAuthor", "Not Author");
         }
 
-        if (_timeProvider.GetUtcNow().UtcDateTime - question.CreatedAt > TimeSpan.FromMinutes(_options.Value.DeleteQuestionInMinutes))
+        if (_timeProvider.GetUtcNow().UtcDateTime - question.CreatedAt >
+            TimeSpan.FromMinutes(_options.Value.DeleteQuestionInMinutes))
         {
             return Error.Conflict("TimeExpired", "time for delete expired");
         }
-        
+
         question.IsDeleted = true;
         _dbContext.Questions.Update(question);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _searchService.RemoveEntry(question.Id);
         return true;
     }
 }

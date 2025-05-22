@@ -54,7 +54,7 @@ builder.Services.AddMediatR(configuration =>
 var elasticOptions = builder.Configuration.GetRequiredSection(ElasticOptions.Section).Get<ElasticOptions>() ??
                      throw new Exception($"Missing {ElasticOptions.Section}");
 
-var settings = new ElasticsearchClientSettings(new Uri(elasticOptions.Url));
+var settings = new ElasticsearchClientSettings(new Uri(elasticOptions.Url)).DefaultIndex(IndexEntry.IndexName);
 var client = new ElasticsearchClient(settings);
 
 builder.Services.AddSingleton(client);
@@ -82,6 +82,20 @@ var app = builder.Build();
 app.MapOpenApi();
 app.MapScalarApiReference();
 
+app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.MapHub<TestHub>("/hubs/hub");
+
+app.MapCarter();
+
+app.UseRouting();
+
 if (!app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -96,16 +110,5 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedComplaintCategories();
 }
 
-app.UseHttpsRedirection();
-
-app.UseCors("CorsPolicy");
-
-app.UseAuthentication();
-
-app.UseAuthorization();
-
-app.MapHub<TestHub>("/hubs/hub");
-
-app.MapCarter();
 
 app.Run();
