@@ -65,9 +65,9 @@ public class SearchService : ISearchService
             .Size(pageSize)
             .Query(q => q.Prefix(w => w
                 .Field(f => f.Title)
-                .Value(startsWith)
+                .Value(startsWith.ToLower())
                 .CaseInsensitive()))
-            .Sort(so => so.Field(f => f.Type, SortOrder.Desc)));
+            .Sort(so => so.Field(f => f.Type.Suffix("keyword"), SortOrder.Desc)));
 
         return response.Documents;
     }

@@ -79,23 +79,6 @@ builder.Services.AddCors(opts =>
 
 var app = builder.Build();
 
-app.MapOpenApi();
-app.MapScalarApiReference();
-
-app.UseHttpsRedirection();
-
-app.UseCors("CorsPolicy");
-
-app.UseAuthentication();
-
-app.UseAuthorization();
-
-app.MapHub<TestHub>("/hubs/hub");
-
-app.MapCarter();
-
-app.UseRouting();
-
 if (!app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -110,5 +93,19 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedComplaintCategories();
 }
 
+app.MapOpenApi();
+app.MapScalarApiReference();
+
+app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.MapHub<TestHub>("/hubs/hub");
+
+app.MapCarter();
 
 app.Run();
