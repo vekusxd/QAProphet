@@ -115,10 +115,7 @@ public class Seed
             Url = url ?? throw new ArgumentException(nameof(url))
         }).ToList();
 
-        await _client.BulkAsync(b => b
-            .Index(IndexEntry.IndexName)
-            .IndexMany(entries)
-        );
+       await _client.IndexManyAsync(entries);
     }
 
     public async Task SeedComplaintCategories()

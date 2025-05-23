@@ -43,7 +43,7 @@ internal sealed class KeycloakSecuritySchemeTransformer : IOpenApiDocumentTransf
 
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
-        document.Components.SecuritySchemes["Keycloak"] = securityScheme;
+        document.Components.SecuritySchemes["OAuth"] = securityScheme;
 
         var requirement = new OpenApiSecurityRequirement
         {
@@ -51,7 +51,7 @@ internal sealed class KeycloakSecuritySchemeTransformer : IOpenApiDocumentTransf
             {
                 Reference = new OpenApiReference
                 {
-                    Id = "Keycloak",
+                    Id = "OAuth",
                     Type = ReferenceType.SecurityScheme
                 }
             }] = []

@@ -1,83 +1,107 @@
 ﻿services:
-  qaprophet_api:
+  api:
     image: qaprophet_api
+    container_name: api
     ports:
       - "8080:8080"
     depends_on:
-      - qaprophet_db
-      - qaprophet_identity
-      - seq
-      - elastic
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      elastic:
+        condition: service_healthy
     build:
       context: .
       dockerfile: QAProphet/Dockerfile
     environment:
-      ConnectionStrings__DefaultConnection: "Server=qaprophet_db;Port=5432;Database=qaDb;User Id=postgres;Password=root;"
+      ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=qaDb;User Id=postgres;Password=root;"
       Keycloak__AuthorizationUrl: "http://localhost:18080/realms/qaProphet/protocol/openid-connect/auth"
-      Authentication__MetadataAddress: "http://localhost:18080/qaProphet/.well-known/openid-configuration"
-      Authentication__ValidIssuer: "http://localhost:18080/qaProphet"
+      Authentication__MetadataAddress: "http://keycloak:8080/realms/qaProphet/.well-known/openid-configuration"
+      Authentication__ValidIssuer: "http://localhost:18080/realms/qaProphet"
       Authentication__ValidAudience: "account"
       ElasticOptions__Url: "http://elastic:9200"
-
-  qaprophet_db:
-    image: postgres
+  
+  postgres:
+    image: postgres:17
+    container_name: postgres
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d qaDb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
       - ./KeycloakConfiguration/initSchema.sql:/docker-entrypoint-initdb.d/init_schema.sql
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: qaDb
-
-  qaprophet_identity:
-    image: quay.io/keycloak/keycloak:latest
-    command: ["start-dev", "--import-realm"]
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    container_name: keycloak
+    command: [ "start-dev", "--import-realm" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --head -fsS http://localhost:9000/health/ready || exit 0" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
     environment:
       KC_HEALTH_ENABLED: true
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_DB: postgres
-      KC_DB_URL: "jdbc:postgresql://qaprophet_db:5432/qaDb"
+      KC_DB_URL: "jdbc:postgresql://postgres:5432/qaDb"
       KC_DB_SCHEMA: keycloak
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: root
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_HTTPS: false
     depends_on:
-      - qaprophet_db
+      postgres:
+        condition: service_healthy
     volumes:
-      - identity-data:/opt/keycloak/data
+      - keycloak_data:/opt/keycloak/data
       - ./KeycloakConfiguration/qaProphetTheme.jar:/opt/keycloak/providers/qaProphetTheme.jar
       - ./KeycloakConfiguration/realm-export.json:/opt/keycloak/data/import/realm-export.json
     ports:
       - "18080:8080"
-
-  seq:
-    image: datalust/seq
-    ports:
-      - "5341:5341"
-      - "8081:80"
-    volumes:
-      - seq_data:/data
-    environment:
-      ACCEPT_EULA: Y
-
+  
   elastic:
     image: elasticsearch:9.0.1
+    container_name: elastic
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
     volumes:
-      - elasticsearch_data:/data/elastic
+      - elastic_data:/data/elastic
+
+  seq:
+    container_name: seq
+    image: datalust/seq
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    volumes:
+      - seq_logs_data:/data
+    environment:
+      ACCEPT_EULA: Y
+
 
 volumes:
-  db_data:
-  identity-data:
-  seq_data:
-  elasticsearch_data:
+  postgres_data:
+  keycloak_data:
+  seq_logs_data:
+  elastic_data:
