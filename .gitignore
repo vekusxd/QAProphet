@@ -10,7 +10,9 @@
 *.suo
 *.user
 *.userosscache
-*.sln.docstates
+*.sln.docstate
+QAProphet/_site/*
+QAProphet/api/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
